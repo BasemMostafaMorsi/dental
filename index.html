@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Dr. Ayman Mostafa Alawady — Dental Clinic</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Noto+Kufi+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#0F3460;--blue:#1A5F9E;--sky:#3A8FD4;--light-blue:#E8F3FB;
+  --accent:#2BBFA4;--accent-light:#E0F7F3;
+  --warn:#E8A020;--warn-light:#FEF3DC;
+  --danger:#D94040;--danger-light:#FDEAEA;
+  --gray-50:#F7F9FC;--gray-100:#EEF2F7;--gray-200:#D9E3EE;
+  --gray-400:#8FA5BE;--gray-600:#4A6580;--gray-800:#1E3248;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(15,52,96,0.08);--shadow-md:0 4px 24px rgba(15,52,96,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;}
+[dir="rtl"] body{font-family:'Noto Kufi Arabic',sans-serif;}
+
+/* LOADING */
+.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0F3460,#1A5F9E,#2BBFA4);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+.loading-screen .logo{width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.loading-screen .logo svg{width:36px;height:36px;}
+.loading-screen h2{color:white;font-size:18px;font-weight:600;margin-bottom:6px;}
+.loading-screen p{color:rgba(255,255,255,.6);font-size:13px;margin-bottom:28px;}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0F3460 0%,#1A5F9E 60%,#2BBFA4 100%);padding:16px;}
+.auth-card{background:white;border-radius:20px;padding:40px 44px;width:420px;max-width:100%;box-shadow:var(--shadow-md);}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.auth-icon{width:48px;height:48px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.auth-icon svg{width:26px;height:26px;}
+.auth-clinic-name{font-size:15px;font-weight:600;color:var(--navy);line-height:1.3;}
+.auth-doctor{font-size:12px;color:var(--gray-400);}
+.auth-title{font-size:22px;font-weight:600;color:var(--navy);margin:22px 0 5px;}
+.auth-sub{font-size:13px;color:var(--gray-400);margin-bottom:26px;line-height:1.5;}
+.auth-group{margin-bottom:15px;}
+.auth-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:5px;}
+.auth-group input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13.5px;color:var(--gray-800);transition:border-color .15s;}
+.auth-group input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(58,143,212,.12);}
+.auth-btn{width:100%;padding:12px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.auth-btn:hover{background:var(--navy);}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;}
+.auth-err{font-size:12px;margin-top:8px;text-align:center;min-height:18px;padding:6px 10px;border-radius:6px;}
+.auth-err.err{color:var(--danger);background:var(--danger-light);}
+.auth-err.ok{color:#1a8a74;background:var(--accent-light);}
+.auth-toggle{text-align:center;margin-top:18px;font-size:13px;color:var(--gray-400);}
+.auth-toggle a{color:var(--blue);cursor:pointer;font-weight:500;}
+.auth-lang-btn{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;padding:7px 16px;border-radius:99px;font-size:12.5px;cursor:pointer;font-family:inherit;}
+[dir="rtl"] .auth-lang-btn{right:auto;left:18px;}
+
+/* APP LAYOUT */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:232px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s;}
+.sidebar-brand{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.brand-row{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+.brand-icon{width:38px;height:38px;background:var(--accent);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-icon svg{width:20px;height:20px;}
+.brand-name{font-size:13px;font-weight:600;color:white;line-height:1.3;}
+.brand-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px;}
+.sidebar-nav{padding:14px 12px;flex:1;overflow-y:auto;}
+.nav-section{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;padding:10px 8px 5px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;font-weight:400;margin-bottom:2px;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left;}
+[dir="rtl"] .nav-item{text-align:right;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:white;}
+.nav-item.active{background:var(--blue);color:white;font-weight:500;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);}
+.sf-user{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:2px;}
+.sf-email{font-size:12px;color:rgba(255,255,255,.8);font-weight:500;margin-bottom:10px;word-break:break-all;}
+.sf-btns{display:flex;gap:6px;}
+.sf-btn{flex:1;padding:7px 4px;border:1px solid rgba(255,255,255,.2);background:none;color:rgba(255,255,255,.6);border-radius:var(--radius-sm);font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s;}
+.sf-btn:hover{background:rgba(255,255,255,.1);color:white;}
+
+/* MAIN */
+.main{flex:1;overflow:auto;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:white;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:10;}
+.topbar-left h2{font-size:18px;font-weight:600;color:var(--navy);}
+.topbar-left p{font-size:12px;color:var(--gray-400);margin-top:1px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.content{padding:24px 28px;flex:1;}
+.page{display:none;animation:fadeIn .18s ease;}.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s;}
+.btn svg{width:14px;height:14px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--blue);color:white;}.btn-primary:hover:not(:disabled){background:var(--navy);}
+.btn-accent{background:var(--accent);color:white;}.btn-accent:hover{background:#22a08a;}
+.btn-ghost{background:white;color:var(--gray-600);border:1px solid var(--gray-200);}.btn-ghost:hover{background:var(--gray-50);color:var(--gray-800);}
+.btn-danger{background:var(--danger-light);color:var(--danger);border:1px solid #f5c0c0;}.btn-danger:hover{background:#fbd5d5;}
+.btn-warn{background:var(--warn-light);color:#b87010;border:1px solid #f5d78a;}.btn-warn:hover{background:#fde8a0;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:white;border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
+.stat-card.c-blue{border-left-color:var(--blue);}
+.stat-card.c-accent{border-left-color:var(--accent);}
+.stat-card.c-warn{border-left-color:var(--warn);}
+.stat-card.c-navy{border-left-color:var(--navy);}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.stat-icon svg{width:17px;height:17px;}
+.stat-icon.c-blue{background:var(--light-blue);}
+.stat-icon.c-accent{background:var(--accent-light);}
+.stat-icon.c-warn{background:var(--warn-light);}
+.stat-icon.c-navy{background:var(--light-blue);}
+.stat-val{font-size:26px;font-weight:600;color:var(--navy);line-height:1;margin-bottom:4px;}
+.stat-label{font-size:12px;color:var(--gray-400);}
+
+/* CARD */
+.card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);}
+.card-body{padding:20px;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;background:var(--gray-50);border-bottom:1px solid var(--gray-200);white-space:nowrap;}
+[dir="rtl"] thead th{text-align:right;}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-800);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--gray-50);}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;}
+.b-active{background:var(--accent-light);color:#1a8a74;}.b-active::before{background:var(--accent);}
+.b-pending{background:var(--warn-light);color:#b87010;}.b-pending::before{background:var(--warn);}
+.b-inactive{background:var(--gray-100);color:var(--gray-600);}.b-inactive::before{background:var(--gray-400);}
+.b-visit{background:var(--light-blue);color:var(--blue);}.b-visit::before{background:var(--sky);}
+
+/* AVATAR */
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.pt-cell{display:flex;align-items:center;gap:10px;}
+.pt-main{font-weight:500;font-size:13px;color:var(--navy);}
+.pt-sub{font-size:11px;color:var(--gray-400);}
+
+/* FORM */
+.form-section{margin-bottom:22px;}
+.section-head{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--light-blue);display:flex;align-items:center;gap:6px;}
+.section-head svg{width:13px;height:13px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11.5px;font-weight:600;color:var(--gray-600);}
+.fg input,.fg select,.fg textarea{padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--gray-800);background:white;transition:border-color .15s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(58,143,212,.12);}
+.fg textarea{height:76px;resize:vertical;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.full{grid-column:1/-1;}
+.form-foot{display:flex;gap:8px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--gray-100);margin-top:4px;}
+.fmsg{font-size:12px;text-align:right;margin-top:6px;min-height:16px;}
+.fmsg.ok{color:#1a8a74;}.fmsg.err{color:var(--danger);}
+[dir="rtl"] .fmsg{text-align:left;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(15,52,96,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal{background:white;border-radius:16px;width:640px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md);transform:translateY(8px);transition:transform .2s;}
+.modal-ov.open .modal{transform:translateY(0);}
+.modal-top{padding:17px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1;}
+.modal-top h2{font-size:16px;font-weight:600;color:var(--navy);}
+.modal-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--gray-200);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:14px;}
+.modal-close:hover{background:var(--gray-50);}
+.modal-body{padding:24px;}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--gray-100);display:flex;gap:8px;justify-content:flex-end;}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;}
+.det-row{padding:9px 0;border-bottom:1px solid var(--gray-100);}
+.det-row:last-child{border-bottom:none;}
+.det-label{font-size:10.5px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.det-val{font-size:13px;color:var(--gray-800);margin-top:2px;}
+
+/* VISIT ITEMS */
+.visit-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--gray-100);align-items:flex-start;}
+.visit-item:last-child{border-bottom:none;}
+.vdate{min-width:78px;}
+.vdate-main{font-size:12px;font-weight:600;color:var(--navy);}
+.vdate-yr{font-size:11px;color:var(--gray-400);}
+.vdot{width:8px;height:8px;border-radius:50%;background:var(--sky);margin-top:3px;flex-shrink:0;}
+.vdet strong{font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:2px;}
+.vdet span{font-size:12px;color:var(--gray-400);}
+.vcost{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;}
+.vbal{font-size:11px;color:var(--danger);}
+
+/* NOTIFY MODAL */
+.notify-modal{background:white;border-radius:18px;width:460px;max-width:96vw;box-shadow:var(--shadow-md);transform:translateY(10px);transition:transform .22s;}
+.modal-ov.open .notify-modal{transform:translateY(0);}
+.notify-top{background:linear-gradient(135deg,#0F3460,#1A5F9E);border-radius:18px 18px 0 0;padding:22px 24px 18px;color:white;}
+.notify-top h2{font-size:16px;font-weight:600;margin-bottom:3px;}
+.notify-top p{font-size:12px;opacity:.7;}
+.notify-appt{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:var(--radius-sm);padding:12px 16px;margin:16px 0;display:flex;align-items:center;gap:12px;}
+.notify-appt svg{width:22px;height:22px;color:var(--accent);flex-shrink:0;}
+.notify-appt-text strong{display:block;font-size:14px;font-weight:600;color:var(--navy);}
+.notify-appt-text span{font-size:12px;color:var(--gray-600);}
+.notify-msg-box{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--gray-800);resize:vertical;height:110px;margin-bottom:14px;}
+.notify-msg-box:focus{outline:none;border-color:var(--sky);}
+.notify-btns{display:flex;flex-direction:column;gap:10px;}
+.notify-btn{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;}
+.notify-btn-wa{background:#25D366;color:white;}.notify-btn-wa:hover{background:#1da851;}
+.notify-btn-sms{background:var(--light-blue);color:var(--navy);border:1.5px solid var(--gray-200);}.notify-btn-sms:hover{background:#d4eaf8;}
+.notify-btn svg{width:22px;height:22px;flex-shrink:0;}
+.notify-btn-label{display:flex;flex-direction:column;align-items:flex-start;}
+.notify-btn-label strong{font-size:13.5px;}
+.notify-btn-label span{font-size:11px;opacity:.75;}
+.notify-skip{background:none;border:none;color:var(--gray-400);font-size:13px;cursor:pointer;font-family:inherit;width:100%;padding:8px;margin-top:2px;}
+.notify-skip:hover{color:var(--gray-600);}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:16px;}
+.srch-wrap{position:relative;flex:1;}
+.srch-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--gray-400);pointer-events:none;}
+[dir="rtl"] .srch-wrap svg{left:auto;right:12px;}
+.srch-wrap input{padding-left:36px;width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;padding-top:9px;padding-bottom:9px;color:var(--gray-800);}
+[dir="rtl"] .srch-wrap input{padding-left:12px;padding-right:36px;}
+.srch-wrap input:focus{outline:none;border-color:var(--sky);}
+.flt-sel{padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--gray-800);width:160px;}
+
+/* RESET PANEL */
+.reset-panel{background:linear-gradient(135deg,#fff5e6,#fff);border:1.5px solid #f5d78a;border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;}
+.reset-panel h3{font-size:14px;font-weight:600;color:#b87010;margin-bottom:6px;}
+.reset-panel p{font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.6;}
+
+/* SYNC INDICATOR */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-left:6px;}
+.sync-dot.syncing{background:var(--warn);animation:pulse .8s ease-in-out infinite alternate;}
+.sync-dot.error{background:var(--danger);}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;box-shadow:var(--shadow-md);z-index:1000;transform:translateY(60px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:8px;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--accent);}
+.toast.err{background:var(--danger);}
+[dir="rtl"] .toast{right:auto;left:24px;}
+
+/* EMPTY */
+.empty-state{padding:44px 20px;text-align:center;}
+.empty-state svg{width:44px;height:44px;color:var(--gray-200);margin-bottom:12px;}
+.empty-state strong{color:var(--gray-600);display:block;font-size:15px;margin-bottom:6px;}
+.empty-state p{color:var(--gray-400);font-size:13px;}
+
+/* MOBILE TOPBAR */
+.mob-topbar{display:none;background:var(--navy);padding:12px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.mob-topbar-left{display:flex;align-items:center;gap:10px;}
+.mob-brand-icon{width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mob-brand-icon svg{width:17px;height:17px;}
+.mob-topbar-title{font-size:14px;font-weight:600;color:white;}
+.mob-topbar-sub{font-size:10px;color:rgba(255,255,255,.5);}
+.mob-topbar-right{display:flex;gap:6px;}
+.mob-icon-btn{width:34px;height:34px;background:rgba(255,255,255,.1);border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:white;}
+.mob-icon-btn svg{width:17px;height:17px;}
+
+/* MOBILE BOTTOM NAV */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);z-index:100;border-top:1px solid rgba(255,255,255,.08);padding-bottom:env(safe-area-inset-bottom);}
+.mob-nav-inner{display:flex;}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:none;background:none;color:rgba(255,255,255,.45);font-family:inherit;cursor:pointer;transition:color .15s;}
+.mob-nav-btn svg{width:20px;height:20px;}
+.mob-nav-btn span{font-size:9.5px;font-weight:500;}
+.mob-nav-btn.active{color:var(--accent);}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:99px;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .topbar{display:none;}
+  .mob-topbar{display:flex;}
+  .mob-nav{display:block;}
+  .app{flex-direction:column;}
+  .main{padding-bottom:64px;}
+  .content{padding:14px;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .stat-card{padding:13px 14px;}
+  .stat-icon{margin-bottom:8px;}
+  .stat-val{font-size:22px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .full{grid-column:1/-1;}
+  .card{border-radius:10px;margin-bottom:12px;}
+  .card-body{padding:14px;}
+  .hide-mobile{display:none;}
+  tbody td{padding:9px 10px;}
+  thead th{padding:8px 10px;}
+  .pt-sub{display:none;}
+  .search-bar{flex-direction:column;gap:8px;}
+  .flt-sel{width:100%;}
+  .modal-ov{align-items:flex-end;}
+  .modal{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:92vh;}
+  .notify-modal{width:100%;max-width:100%;border-radius:20px 20px 0 0;}
+  .notify-top{border-radius:20px 20px 0 0;}
+  .form-foot{flex-direction:column-reverse;}
+  .form-foot .btn{width:100%;justify-content:center;}
+  .toast{bottom:76px;right:10px;left:10px;}
+  [dir="rtl"] .toast{right:10px;left:10px;}
+  .reset-panel{padding:16px;}
+}
+@media(max-width:400px){
+  .content{padding:10px;}
+  .stats-row{gap:8px;}
+  .auth-card{padding:26px 20px;}
+}
+/* PRINT */
+@media print{
+  .sidebar,.mob-nav,.mob-topbar,.topbar,.modal-foot,.modal-close,
+  .btn,.search-bar,.card-head button,.toast,.loading-screen{display:none!important;}
+  .modal-ov{position:static!important;opacity:1!important;pointer-events:all!important;background:none!important;display:block!important;}
+  .modal{box-shadow:none!important;max-height:none!important;border-radius:0!important;width:100%!important;}
+  body{background:white!important;}
+  .print-header{display:block!important;}
+}
+.print-header{display:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1A5F9E;}
+.print-header h1{font-size:18px;color:#0F3460;font-weight:600;}
+.print-header p{font-size:12px;color:#666;margin-top:3px;}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen">
+  <div class="logo"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2C9.5 2 7 4 7 7c0 2 1 3.5 1 5.5 0 3-1.5 7.5 2 8.5 1.5.5 2-1.5 2-3s.5-3 2-3 .5 1.5.5 3-.5 3.5 2 3c3.5-1 2-5.5 2-8.5 0-2 1-3.5 1-5.5C19.5 4 17 2 12 2z"/></svg></div>
+  <h2>Dr. Ayman Mostafa Alawady</h2>
+  <p id="loading-text">Loading clinic data...</p>
+  <div class="spinner"></div>
+</div>
+
+<!-- AUTH -->
+<div id="auth-screen" style="display:none;position:relative;">
+  <button class="auth-lang-btn" onclick="toggleLang()" id="auth-lang-btn">العربية</button>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2C9.5 2 7 4 7 7c0 2 1 3.5 1 5.5 0 3-1.5 7.5 2 8.5 1.5.5 2-1.5 2-3s.5-3 2-3 .5 1.5.5 3-.5 3.5 2 3c3.5-1 2-5.5 2-8.5 0-2 1-3.5 1-5.5C19.5 4 17 2 12 2z"/></svg></div>
+        <div><div class="auth-clinic-name" id="auth-clinic-name">Dental Clinic</div><div class="auth-doctor">Dr. Ayman Mostafa Alawady</div></div>
+      </div>
+      <div class="auth-title" id="auth-title">Welcome back</div>
+      <div class="auth-sub" id="auth-sub">Sign in to access the patient database</div>
+      <div class="auth-group"><label id="lbl-email">Email address</label><input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter')authAction()"/></div>
+      <div class="auth-group"><label id="lbl-password">Password</label><input type="password" id="auth-pass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authAction()"/></div>
+      <div class="auth-group" id="pass2-group" style="display:none;"><label id="lbl-password2">Confirm password</label><input type="password" id="auth-pass2" placeholder="Repeat password"/></div>
+      <button class="auth-btn" id="auth-action-btn" onclick="authAction()"><span id="auth-btn-text">Sign in</span></button>
+      <div class="auth-err" id="auth-err"></div>
+      <div class="auth-toggle"><span id="toggle-text">Don't have an account?</span><a onclick="toggleAuthMode()" id="toggle-link"> Register</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" style="display:none;">
+
+  <!-- MOBILE TOPBAR -->
+  <div class="mob-topbar">
+    <div class="mob-topbar-left">
+      <div class="mob-brand-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2C9.5 2 7 4 7 7c0 2 1 3.5 1 5.5 0 3-1.5 7.5 2 8.5 1.5.5 2-1.5 2-3s.5-3 2-3 .5 1.5.5 3-.5 3.5 2 3c3.5-1 2-5.5 2-8.5 0-2 1-3.5 1-5.5C19.5 4 17 2 12 2z"/></svg></div>
+      <div><div class="mob-topbar-title" id="mob-page-title">Dashboard</div><div class="mob-topbar-sub">Dr. Ayman Alawady<span class="sync-dot" id="mob-sync-dot"></span></div></div>
+    </div>
+    <div class="mob-topbar-right">
+      <button class="mob-icon-btn" onclick="toggleLang()" title="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></button>
+      <button class="mob-icon-btn" onclick="logout()" title="Sign out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-row"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2C9.5 2 7 4 7 7c0 2 1 3.5 1 5.5 0 3-1.5 7.5 2 8.5 1.5.5 2-1.5 2-3s.5-3 2-3 .5 1.5.5 3-.5 3.5 2 3c3.5-1 2-5.5 2-8.5 0-2 1-3.5 1-5.5C19.5 4 17 2 12 2z"/></svg></div><div class="brand-name">Dr. Ayman Mostafa Alawady</div></div>
+        <div class="brand-sub" id="sb-sub">Dental Clinic <span class="sync-dot" id="sync-dot"></span></div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section" id="nav-s-main">MAIN</div>
+        <button class="nav-item active" id="ni-dashboard" onclick="goTo('dashboard',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"/></svg><span id="ni-dashboard-t">Dashboard</span></button>
+        <button class="nav-item" id="ni-patients" onclick="goTo('patients',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span id="ni-patients-t">Patients</span></button>
+        <button class="nav-item" id="ni-add" onclick="goTo('add-patient',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/></svg><span id="ni-add-t">Add Patient</span></button>
+        <div class="nav-section" style="margin-top:10px;" id="nav-s-records">RECORDS</div>
+        <button class="nav-item" id="ni-visits" onclick="goTo('visits',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg><span id="ni-visits-t">Visit Log</span></button>
+        <button class="nav-item" id="ni-export" onclick="goTo('export',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg><span id="ni-export-t">Export / Import</span></button>
+        <button class="nav-item" id="ni-settings" onclick="goTo('settings',this)"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"/></svg><span id="ni-settings-t">Settings</span></button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sf-user" id="sf-user-label">Signed in as</div>
+        <div class="sf-email" id="sf-email"></div>
+        <div class="sf-btns">
+          <button class="sf-btn" onclick="toggleLang()" id="sf-lang-btn">العربية</button>
+          <button class="sf-btn" onclick="logout()" id="sf-logout-btn">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-dashboard">Dashboard</h2><p id="tb-date"></p></div></div>
+        <div class="content">
+          <div class="stats-row">
+            <div class="stat-card c-blue"><div class="stat-icon c-blue"><svg fill="none" stroke="#1A5F9E" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-val" id="s-total">0</div><div class="stat-label" id="s-total-l">Total patients</div></div>
+            <div class="stat-card c-accent"><div class="stat-icon c-accent"><svg fill="none" stroke="#2BBFA4" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-val" id="s-active">0</div><div class="stat-label" id="s-active-l">Active patients</div></div>
+            <div class="stat-card c-warn"><div class="stat-icon c-warn"><svg fill="none" stroke="#E8A020" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val" id="s-visits">0</div><div class="stat-label" id="s-visits-l">Total visits</div></div>
+            <div class="stat-card c-navy"><div class="stat-icon c-navy"><svg fill="none" stroke="#1A5F9E" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="stat-val" id="s-rev" style="filter:blur(6px);user-select:none;transition:filter .3s;">••••</div>
+                <button id="btn-rev-toggle" onclick="toggleReveal()" title="Show revenue" style="background:none;border:1px solid var(--gray-200);border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--gray-400);display:flex;align-items:center;">
+                  <svg id="rev-eye-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+              </div>
+              <div class="stat-label" id="s-rev-l">Revenue (EGP)</div>
+            </div>
+          </div>
+          <div class="card"><div class="card-head"><div class="card-title" id="dash-recent-title">Recent Patients</div></div><div id="dash-recent"></div></div>
+        </div>
+      </div>
+
+      <!-- PATIENTS -->
+      <div id="page-patients" class="page">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-patients">Patients</h2><p id="pt-count-sub"></p></div><div class="topbar-right"><button class="btn btn-primary" onclick="goTo('add-patient',document.getElementById('ni-add'))"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/></svg><span id="btn-new-patient">New Patient</span></button></div></div>
+        <div class="content">
+          <div class="search-bar">
+            <div class="srch-wrap"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg><input type="text" id="pt-search" oninput="renderPatients()"/></div>
+            <select class="flt-sel" id="pt-filter" onchange="renderPatients()"><option value="" id="flt-all">All statuses</option><option id="flt-active">Active</option><option id="flt-pending">Pending</option><option id="flt-inactive">Inactive</option></select>
+          </div>
+          <div class="card"><div class="table-wrap"><table><thead><tr><th id="th-patient">Patient</th><th id="th-id" class="hide-mobile">ID</th><th id="th-age" class="hide-mobile">Age</th><th id="th-phone">Phone</th><th id="th-blood" class="hide-mobile">Blood</th><th id="th-last" class="hide-mobile">Last Visit</th><th id="th-status">Status</th><th></th></tr></thead><tbody id="pt-tbody"></tbody></table></div></div>
+        </div>
+      </div>
+
+      <!-- ADD PATIENT -->
+      <div id="page-add-patient" class="page">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-add-patient">Add New Patient</h2><p id="tb-add-sub">Fill in the patient information below</p></div></div>
+        <div class="content">
+          <div class="card"><div class="card-body">
+            <div class="form-section">
+              <div class="section-head"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg><span id="sh-personal">Personal Information</span></div>
+              <div class="grid2">
+                <div class="fg"><label id="lbl-fname">First name *</label><input id="a-fname" type="text"/></div>
+                <div class="fg"><label id="lbl-lname">Last name *</label><input id="a-lname" type="text"/></div>
+                <div class="fg"><label id="lbl-dob">Date of birth</label><input id="a-dob" type="date"/></div>
+                <div class="fg"><label id="lbl-gender">Gender</label><select id="a-gender"><option value="" id="opt-select">Select...</option><option id="opt-male">Male</option><option id="opt-female">Female</option></select></div>
+                <div class="fg"><label id="lbl-phone">Phone number</label><input id="a-phone" type="tel"/></div>
+                <div class="fg"><label id="lbl-nid">National ID</label><input id="a-nid" type="text"/></div>
+                <div class="fg full"><label id="lbl-addr">Address</label><input id="a-address" type="text"/></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="section-head"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg><span id="sh-medical">Medical & Dental History</span></div>
+              <div class="grid2">
+                <div class="fg"><label id="lbl-blood">Blood type</label><select id="a-blood"><option value="" id="opt-unk">Unknown</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+                <div class="fg"><label id="lbl-allergy">Allergies</label><input id="a-allergy" type="text"/></div>
+                <div class="fg full"><label id="lbl-conditions">Chronic conditions</label><input id="a-conditions" type="text"/></div>
+                <div class="fg full"><label id="lbl-complaint">Chief complaint</label><textarea id="a-complaint"></textarea></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="section-head"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg><span id="sh-admin">Administrative</span></div>
+              <div class="grid2">
+                <div class="fg"><label id="lbl-status">Status</label><select id="a-status"><option id="st-active">Active</option><option id="st-pending">Pending</option><option id="st-inactive">Inactive</option></select></div>
+                <div class="fg"><label id="lbl-regdate">Registration date</label><input id="a-regdate" type="date"/></div>
+              </div>
+            </div>
+            <div class="form-foot">
+              <button class="btn btn-ghost" onclick="clearAddForm()" id="btn-clear">Clear</button>
+              <button class="btn btn-primary" id="btn-save-patient-btn" onclick="savePatient()"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293z"/></svg><span id="btn-save-patient">Save Patient</span></button>
+            </div>
+            <div class="fmsg" id="add-msg"></div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- VISITS -->
+      <div id="page-visits" class="page">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-visits">Visit Log</h2><p id="tb-visits-sub">Track procedures and payments</p></div></div>
+        <div class="content">
+          <div class="card"><div class="card-head"><div class="card-title" id="card-log-visit">Log a New Visit</div></div>
+            <div class="card-body">
+              <div class="grid3">
+                <div class="fg"><label id="lbl-v-patient">Patient *</label><select id="v-patient" onchange="buildDentalChart()"><option value=""></option></select></div>
+                <div class="fg"><label id="lbl-v-date">Visit date *</label><input id="v-date" type="date"/></div>
+                <div class="fg"><label id="lbl-v-proc">Procedure</label><select id="v-proc"><option id="vp-1">Checkup / cleaning</option><option id="vp-2">Extraction</option><option id="vp-3">Filling</option><option id="vp-4">Root canal</option><option id="vp-5">Crown / bridge</option><option id="vp-6">Whitening</option><option id="vp-7">Orthodontics</option><option id="vp-8">Implant</option><option id="vp-9">X-ray</option><option id="vp-10">Other</option></select></div>
+                <div class="fg"><label id="lbl-v-tooth">Tooth number(s)</label><input id="v-tooth" type="text"/></div>
+                <div class="fg"><label id="lbl-v-cost">Cost (EGP)</label><input id="v-cost" type="number" min="0"/></div>
+                <div class="fg"><label id="lbl-v-paid">Paid (EGP)</label><input id="v-paid" type="number" min="0"/></div>
+                <div class="fg full"><label id="lbl-v-notes">Clinical notes</label><textarea id="v-notes"></textarea></div>
+                <div class="fg"><label id="lbl-v-next">Next appointment</label><input id="v-next" type="date"/></div>
+              </div>
+
+              <!-- DENTAL CHART inside form -->
+              <div style="margin-top:20px;border-top:1px solid var(--gray-100);padding-top:16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                  <div style="font-size:13px;font-weight:600;color:var(--navy);" id="card-dental-chart">Dental Chart</div>
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:var(--gray-400);" id="dental-chart-hint">Click any tooth to add diagnosis</span>
+                    <button class="btn btn-ghost btn-sm" id="btn-clear-chart" style="font-size:11px;padding:4px 10px;">Clear all</button>
+                  </div>
+                </div>
+                <!-- Legend -->
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;" id="chart-legend">
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#e8f3fb;border:1.5px solid #1A5F9E;display:inline-block;flex-shrink:0;"></span><span id="leg-healthy">Healthy</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#FDEAEA;border:1.5px solid #D94040;display:inline-block;flex-shrink:0;"></span><span id="leg-cavity">Cavity</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#E0F7F3;border:1.5px solid #2BBFA4;display:inline-block;flex-shrink:0;"></span><span id="leg-filled">Filled</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#FEF3DC;border:1.5px solid #E8A020;display:inline-block;flex-shrink:0;"></span><span id="leg-crown">Crown/Canal</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#EEF2F7;border:1.5px solid #8FA5BE;display:inline-block;flex-shrink:0;"></span><span id="leg-missing">Missing</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-600);"><span style="width:11px;height:11px;border-radius:3px;background:#E8F3FB;border:2px solid #0F3460;display:inline-block;flex-shrink:0;"></span><span id="leg-other">Other</span></div>
+                </div>
+                <svg id="dental-svg" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;display:block;margin:0 auto;"></svg>
+              </div>
+
+              <div class="form-foot"><button class="btn btn-primary" id="btn-save-visit" onclick="saveVisit()">Save Visit</button></div>
+              <div class="fmsg" id="v-msg"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title" id="card-visit-history">All Visits</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <select id="v-filter-patient" onchange="renderVisits()" style="padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;color:var(--gray-800);max-width:160px;">
+                  <option value="" id="vf-all-patients">All patients</option>
+                </select>
+                <span class="badge b-visit" id="v-count-badge">0</span>
+                <button class="btn btn-ghost btn-sm" id="btn-print-all-visits">
+                  <svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a1 1 0 001 1h8a1 1 0 001-1v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2 0h6v3H7V4zm-1 9v-1h8v4H6v-3zm8-5a1 1 0 100 2 1 1 0 000-2z"/></svg>
+                  <span id="btn-print-visits-label">Print</span>
+                </button>
+              </div>
+            </div>
+            <div id="v-list" style="padding:0 20px 8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT -->
+      <div id="page-export" class="page">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-export">Export & Import</h2><p id="tb-export-sub">Manage your Excel data files</p></div></div>
+        <div class="content">
+          <div class="card"><div class="card-head"><div class="card-title" id="card-export-title">Export to Excel</div></div>
+            <div class="card-body"><p style="font-size:13px;color:var(--gray-600);margin-bottom:18px;line-height:1.7;" id="export-desc">Download all patient and visit records as a formatted Excel file.</p>
+            <button class="btn btn-accent" onclick="exportExcel()"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg><span id="btn-download-excel">Download Excel</span></button>
+          </div></div>
+          <div class="card"><div class="card-head"><div class="card-title" id="card-import-title">Import from Excel</div></div>
+            <div class="card-body"><p style="font-size:13px;color:var(--gray-600);margin-bottom:18px;line-height:1.7;" id="import-desc">Import a previously exported Excel file. New records will be merged — no duplicates.</p>
+            <input type="file" id="import-file" accept=".xlsx" style="display:none;" onchange="importExcel(event)"/>
+            <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"/></svg><span id="btn-choose-file">Choose File</span></button>
+            <div class="fmsg" id="import-msg" style="text-align:left;margin-top:10px;min-height:auto;"></div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="page-settings" class="page">
+        <div class="topbar"><div class="topbar-left"><h2 id="tb-settings">Settings</h2><p id="tb-settings-sub">Manage your account and data</p></div></div>
+        <div class="content">
+          <div class="reset-panel">
+            <h3 id="reset-title">Monthly Data Reset</h3>
+            <p id="reset-desc">Reset all patient and visit data for the new month. A backup Excel file will be downloaded first. This cannot be undone.</p>
+            <button class="btn btn-warn" onclick="monthlyReset()"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"/></svg><span id="btn-monthly-reset">Reset for New Month</span></button>
+          </div>
+          <div class="card" style="border:1.5px solid #f5c0c0;">
+            <div class="card-head" style="background:#fff8f8;"><div class="card-title" style="color:var(--danger);" id="card-danger">Danger Zone</div></div>
+            <div class="card-body"><p style="font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.6;" id="danger-desc">Permanently delete ALL clinic data. Your account will remain. This cannot be undone.</p>
+            <button class="btn btn-danger" onclick="deleteAllData()" id="btn-delete-account">Delete All Data</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /app -->
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mob-nav">
+    <div class="mob-nav-inner">
+      <button class="mob-nav-btn active" id="mni-dashboard" onclick="goTo('dashboard',document.getElementById('ni-dashboard'));setMobActive('dashboard')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"/></svg>
+        <span id="mni-dashboard-t">Home</span>
+      </button>
+      <button class="mob-nav-btn" id="mni-patients" onclick="goTo('patients',document.getElementById('ni-patients'));setMobActive('patients')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        <span id="mni-patients-t">Patients</span>
+      </button>
+      <button class="mob-nav-btn" id="mni-add" onclick="goTo('add-patient',document.getElementById('ni-add'));setMobActive('add')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/></svg>
+        <span id="mni-add-t">Add</span>
+      </button>
+      <button class="mob-nav-btn" id="mni-visits" onclick="goTo('visits',document.getElementById('ni-visits'));setMobActive('visits')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
+        <span id="mni-visits-t">Visits</span>
+      </button>
+      <button class="mob-nav-btn" id="mni-more" onclick="goTo('export',document.getElementById('ni-export'));setMobActive('more')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/></svg>
+        <span id="mni-more-t">More</span>
+      </button>
+    </div>
+  </nav>
+
+</div><!-- /app-screen -->
+
+<!-- REVENUE PASSWORD MODAL -->
+<div class="modal-ov" id="rev-modal">
+  <div class="modal" style="width:360px;max-width:96vw;">
+    <div class="modal-top"><h2 id="rev-modal-title">Enter Password</h2><button class="modal-close" id="btn-rev-modal-close">✕</button></div>
+    <div class="modal-body" style="padding:20px 24px;">
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;" id="rev-modal-desc">Enter your account password to view revenue.</p>
+      <div class="fg"><label id="rev-pass-label">Password</label><input type="password" id="rev-pass-input" style="width:100%;"/></div>
+      <div class="fmsg err" id="rev-pass-err" style="margin-top:8px;height:auto;"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" id="btn-rev-cancel">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="btn-rev-confirm">Show Revenue</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOTH DIAGNOSIS MODAL -->
+<div class="modal-ov" id="tooth-modal">
+  <div class="modal" style="width:440px;max-width:96vw;">
+    <div class="modal-top">
+      <h2 id="tooth-modal-title">Tooth #<span id="tooth-modal-num"></span></h2>
+      <button class="modal-close" id="btn-tooth-modal-close">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px;">
+      <!-- Tooth identity header -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:12px 14px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);">
+        <div id="tooth-color-badge" style="width:36px;height:36px;border-radius:8px;border:2px solid #1A5F9E;background:#EBF3FB;flex-shrink:0;transition:all .2s;"></div>
+        <div>
+          <div style="font-size:10.5px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;" id="tooth-modal-name-label">Tooth name</div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy);" id="tooth-modal-name"></div>
+        </div>
+      </div>
+      <!-- Condition select -->
+      <div class="fg" style="margin-bottom:14px;">
+        <label id="tooth-condition-label">Condition</label>
+        <select id="tooth-condition" style="width:100%;" onchange="updateToothColorPreview()">
+          <option value=""></option>
+          <option value="cavity"></option>
+          <option value="filled"></option>
+          <option value="crown"></option>
+          <option value="rootcanal"></option>
+          <option value="extracted"></option>
+          <option value="implant"></option>
+          <option value="bridge"></option>
+          <option value="other"></option>
+        </select>
+      </div>
+      <!-- Notes -->
+      <div class="fg">
+        <label id="tooth-notes-label">Diagnosis / Notes</label>
+        <textarea id="tooth-notes" style="height:90px;width:100%;"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" id="btn-tooth-clear">Clear</button>
+      <button class="btn btn-ghost btn-sm" id="btn-tooth-cancel">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="btn-tooth-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFY MODAL -->
+<div class="modal-ov" id="notify-modal">
+  <div class="notify-modal">
+    <div class="notify-top"><h2 id="nm-title">Send Appointment Reminder</h2><p id="nm-sub">Notify the patient about their next appointment</p></div>
+    <div style="padding:18px 22px;">
+      <div class="notify-appt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div class="notify-appt-text"><strong id="nm-date">—</strong><span id="nm-patient-name">—</span></div></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px;" id="nm-msg-label">Message</div>
+      <textarea class="notify-msg-box" id="nm-message"></textarea>
+      <div class="notify-btns">
+        <button class="notify-btn notify-btn-wa" id="btn-nm-wa">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2C6.472 2 2 6.473 2 12c0 1.99.588 3.867 1.6 5.454L2 22l4.655-1.576A9.95 9.95 0 0012 22c5.527 0 10-4.473 10-10S17.517 2 11.99 2zm.01 18c-1.703 0-3.293-.477-4.647-1.303l-.334-.198-3.455 1.168 1.155-3.4-.216-.347A7.95 7.95 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/></svg>
+          <div class="notify-btn-label"><strong id="nm-wa-label">Send via WhatsApp</strong><span id="nm-wa-sub">Opens WhatsApp Web — one click to send</span></div>
+        </button>
+        <button class="notify-btn notify-btn-sms" id="btn-nm-sms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <div class="notify-btn-label"><strong id="nm-sms-label">Send via SMS</strong><span id="nm-sms-sub">Opens your SMS app with the message ready</span></div>
+        </button>
+        <button class="notify-skip" id="btn-nm-skip" id="nm-skip">Skip — don't send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PATIENT DETAIL MODAL -->
+<div class="modal-ov" id="pt-modal">
+  <div class="modal">
+    <div class="modal-top"><h2 id="modal-title">Patient</h2><button class="modal-close" id="btn-pt-modal-close">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" id="modal-del-btn">Delete</button>
+      <button class="btn btn-ghost btn-sm" id="btn-print-patient"><svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a1 1 0 001 1h8a1 1 0 001-1v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2 0h6v3H7V4zm-1 9v-1h8v4H6v-3zm8-5a1 1 0 100 2 1 1 0 000-2z"/></svg><span id="btn-print-label">Print</span></button>
+      <button class="btn btn-ghost btn-sm" id="btn-pt-modal-close2" id="btn-close-modal">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── GLOBAL STATE (accessible to all scripts) ──
+var lang = localStorage.getItem('dc_lang') || 'en';
+var currentUser = null;
+var patients = [];
+var visits = [];
+var unsubPatients = null;
+var unsubVisits = null;
+var _notifyPhone = '';
+var _fbAuth = null;
+var _fbDb = null;
+
+// Fallback: if Firebase never loads, show auth after 12s
+var _loadTimeout = setTimeout(function(){
+  var ls = document.getElementById('loading-screen');
+  if(ls && ls.style.display !== 'none'){
+    ls.style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'block';
+    document.getElementById('auth-err').textContent = 'Could not connect. Check your internet.';
+    document.getElementById('auth-err').className = 'auth-err err';
+  }
+}, 12000);
+
+// ── STUB FUNCTIONS (available immediately for onclick) ──
+// These get replaced once Firebase loads, but stubs prevent "not defined" errors
+
+window.toggleLang = function(){
+  lang = lang==='en' ? 'ar' : 'en';
+  localStorage.setItem('dc_lang', lang);
+  if(typeof applyLang === 'function') applyLang();
+};
+
+window.toggleAuthMode = function(){
+  if(typeof _toggleAuthMode === 'function') _toggleAuthMode();
+};
+
+window.authAction = function(){
+  if(typeof _authAction === 'function') _authAction();
+  else {
+    document.getElementById('auth-err').textContent = 'Loading... please wait.';
+    document.getElementById('auth-err').className = 'auth-err err';
+  }
+};
+
+window.logout = function(){ if(_fbAuth) _fbAuth.signOut(); };
+window.goTo = function(p,el){ if(typeof _goTo==='function') _goTo(p,el); };
+window.setMobActive = function(k){ if(typeof _setMobActive==='function') _setMobActive(k); };
+window.viewPatient = function(id){ if(typeof _viewPatient==='function') _viewPatient(id); };
+window.savePatient = function(){ if(typeof _savePatient==='function') _savePatient(); };
+window.clearAddForm = function(){ if(typeof _clearAddForm==='function') _clearAddForm(); };
+window.saveVisit = function(){ if(typeof _saveVisit==='function') _saveVisit(); };
+window.exportExcel = function(l){ if(typeof _exportExcel==='function') _exportExcel(l); };
+window.importExcel = function(e){ if(typeof _importExcel==='function') _importExcel(e); };
+window.monthlyReset = function(){ if(typeof _monthlyReset==='function') _monthlyReset(); };
+window.deleteAllData = function(){ if(typeof _deleteAllData==='function') _deleteAllData(); };
+window.renderPatients = function(){ if(typeof _renderPatients==='function') _renderPatients(); };
+window.buildDentalChart = function(){ if(typeof _buildDentalChart==='function') _buildDentalChart(); };
+window.updateToothColorPreview = function(){ if(typeof _updateToothColorPreview==='function') _updateToothColorPreview(); };
+window.sendWhatsApp = function(){ if(typeof _sendWhatsApp==='function') _sendWhatsApp(); };
+window.sendSMS = function(){ if(typeof _sendSMS==='function') _sendSMS(); };
+window.printAllVisits = function(){ if(typeof _printAllVisits==='function') _printAllVisits(); };
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDocs, onSnapshot, query, orderBy, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const _FB_CONFIG = {
+  apiKey:"AIzaSyA-cDHWlcWRf-F9lsRjhJAzqfkZGqfXTX4",
+  authDomain:"dental-clinic-alawady.firebaseapp.com",
+  projectId:"dental-clinic-alawady",
+  storageBucket:"dental-clinic-alawady.firebasestorage.app",
+  messagingSenderId:"1055053845791",
+  appId:"1:1055053845791:web:c33a42e7b2fd1b3284cc2a"
+};
+
+const _app = initializeApp(_FB_CONFIG);
+_fbAuth = getAuth(_app);
+_fbDb = getFirestore(_app);
+
+// ── TRANSLATIONS ──
+const T = {
+  en: {
+    'auth-clinic-name':'Dental Clinic','auth-title':'Welcome back','auth-sub':'Sign in to access the patient database',
+    'lbl-email':'Email address','lbl-password':'Password','lbl-password2':'Confirm password',
+    'auth-btn-text':'Sign in','toggle-text':"Don't have an account?",'toggle-link':' Register',
+    'auth-lang-btn':'العربية','sf-lang-btn':'العربية','sf-logout-btn':'Sign out','sf-user-label':'Signed in as',
+    'nav-s-main':'MAIN','nav-s-records':'RECORDS',
+    'ni-dashboard-t':'Dashboard','ni-patients-t':'Patients','ni-add-t':'Add Patient',
+    'ni-visits-t':'Visit Log','ni-export-t':'Export / Import','ni-settings-t':'Settings',
+    'tb-dashboard':'Dashboard','tb-patients':'Patients','tb-add-patient':'Add New Patient',
+    'tb-add-sub':'Fill in patient information below','tb-visits':'Visit Log',
+    'tb-visits-sub':'Track procedures and payments','tb-export':'Export & Import',
+    'tb-export-sub':'Manage your Excel data files','tb-settings':'Settings',
+    'tb-settings-sub':'Manage your account and data',
+    's-total-l':'Total patients','s-active-l':'Active patients','s-visits-l':'Total visits','s-rev-l':'Revenue (EGP)',
+    'dash-recent-title':'Recent Patients','btn-new-patient':'New Patient',
+    'th-patient':'Patient','th-id':'ID','th-age':'Age','th-phone':'Phone','th-blood':'Blood','th-last':'Last Visit','th-status':'Status',
+    'flt-all':'All statuses','flt-active':'Active','flt-pending':'Pending','flt-inactive':'Inactive',
+    'sh-personal':'Personal Information','sh-medical':'Medical & Dental History','sh-admin':'Administrative',
+    'lbl-fname':'First name *','lbl-lname':'Last name *','lbl-dob':'Date of birth','lbl-gender':'Gender',
+    'lbl-phone':'Phone number','lbl-nid':'National ID','lbl-addr':'Address',
+    'lbl-blood':'Blood type','lbl-allergy':'Allergies','lbl-conditions':'Chronic conditions','lbl-complaint':'Chief complaint',
+    'lbl-status':'Status','lbl-regdate':'Registration date',
+    'opt-select':'Select...','opt-male':'Male','opt-female':'Female','opt-unk':'Unknown',
+    'st-active':'Active','st-pending':'Pending','st-inactive':'Inactive',
+    'btn-clear':'Clear','btn-save-patient':'Save Patient',
+    'card-log-visit':'Log a New Visit','card-visit-history':'All Visits',
+    'lbl-v-patient':'Patient *','lbl-v-date':'Visit date *','lbl-v-proc':'Procedure',
+    'lbl-v-tooth':'Tooth number(s)','lbl-v-cost':'Cost (EGP)','lbl-v-paid':'Paid (EGP)',
+    'lbl-v-notes':'Clinical notes','lbl-v-next':'Next appointment','btn-save-visit':'Save Visit',
+    'vp-1':'Checkup / cleaning','vp-2':'Extraction','vp-3':'Filling','vp-4':'Root canal',
+    'vp-5':'Crown / bridge','vp-6':'Whitening','vp-7':'Orthodontics','vp-8':'Implant','vp-9':'X-ray','vp-10':'Other',
+    'card-export-title':'Export to Excel','card-import-title':'Import from Excel',
+    'export-desc':'Download all patient and visit records as a formatted Excel file.',
+    'import-desc':'Import a previously exported Excel file. New records will be merged — no duplicates.',
+    'btn-download-excel':'Download Excel','btn-choose-file':'Choose File',
+    'reset-title':'Monthly Data Reset','btn-monthly-reset':'Reset for New Month',
+    'reset-desc':'Reset all data for the new month. A backup Excel file will be downloaded first. Cannot be undone.',
+    'card-danger':'Danger Zone','danger-desc':'Permanently delete ALL clinic data. Your account will remain.',
+    'btn-delete-account':'Delete All Data','btn-close-modal':'Close',
+    'sb-sub':'Dental Clinic',
+    'nm-title':'Send Appointment Reminder','nm-sub':'Notify the patient about their next appointment',
+    'nm-msg-label':'Message','nm-wa-label':'Send via WhatsApp','nm-wa-sub':'Opens WhatsApp Web — one click to send',
+    'nm-sms-label':'Send via SMS','nm-sms-sub':'Opens your SMS app with the message ready',
+    'nm-skip':"Skip — don't send",
+    'mni-dashboard-t':'Home','mni-patients-t':'Patients','mni-add-t':'Add','mni-visits-t':'Visits','mni-more-t':'More',
+    'pt-search-ph':'Search by name, phone, or ID...',
+    'loading-text':'Loading clinic data...',
+    'err-fill-name':'Please enter first and last name.','ok-patient-saved':'Patient saved.',
+    'err-sel-patient':'Please select a patient.','err-sel-date':'Please enter a date.',
+    'ok-visit-saved':'Visit saved.','ok-imported':'records imported.',
+    'err-no-data':'No data to export.','ok-excel-dl':'Excel downloaded!',
+    'confirm-reset':'Download backup and DELETE ALL data for this month?',
+    'ok-reset':'Data reset. Backup downloaded.',
+    'confirm-del-patient':'Delete this patient and all their visits? Cannot be undone.',
+    'ok-del-patient':'Patient deleted.',
+    'confirm-del-all':'DELETE ALL clinic data permanently?',
+    'ok-del-all':'All data deleted.',
+    'no-visits-yet':'No visits recorded yet.',
+    'no-patients':'No patients found.',
+    'no-results':'No results match your search.',
+    'syncing':'Syncing...','synced':'Synced ✓','sync-err':'Sync error',
+    'leg-healthy':'Healthy','leg-cavity':'Cavity','leg-filled':'Filled',
+    'leg-crown':'Crown/Canal','leg-missing':'Missing','leg-other':'Other',
+    'dental-chart-hint':'Click any tooth to add diagnosis',
+    'btn-clear-chart':'Clear all','card-dental-chart':'Dental Chart',
+    'vf-all-patients':'All patients','btn-print-visits-label':'Print',
+  },
+  ar: {
+    'auth-clinic-name':'عيادة الأسنان','auth-title':'مرحباً بعودتك','auth-sub':'سجّل الدخول للوصول إلى قاعدة بيانات المرضى',
+    'lbl-email':'البريد الإلكتروني','lbl-password':'كلمة المرور','lbl-password2':'تأكيد كلمة المرور',
+    'auth-btn-text':'تسجيل الدخول','toggle-text':'ليس لديك حساب؟','toggle-link':' إنشاء حساب',
+    'auth-lang-btn':'English','sf-lang-btn':'English','sf-logout-btn':'تسجيل الخروج','sf-user-label':'مسجّل كـ',
+    'nav-s-main':'الرئيسية','nav-s-records':'السجلات',
+    'ni-dashboard-t':'لوحة التحكم','ni-patients-t':'المرضى','ni-add-t':'إضافة مريض',
+    'ni-visits-t':'سجل الزيارات','ni-export-t':'تصدير / استيراد','ni-settings-t':'الإعدادات',
+    'tb-dashboard':'لوحة التحكم','tb-patients':'المرضى','tb-add-patient':'إضافة مريض جديد',
+    'tb-add-sub':'يرجى ملء بيانات المريض أدناه','tb-visits':'سجل الزيارات',
+    'tb-visits-sub':'تتبع الإجراءات والمدفوعات','tb-export':'تصدير واستيراد',
+    'tb-export-sub':'إدارة ملفات Excel','tb-settings':'الإعدادات',
+    'tb-settings-sub':'إدارة حسابك وبياناتك',
+    's-total-l':'إجمالي المرضى','s-active-l':'المرضى النشطون','s-visits-l':'إجمالي الزيارات','s-rev-l':'الإيرادات (جنيه)',
+    'dash-recent-title':'أحدث المرضى','btn-new-patient':'مريض جديد',
+    'th-patient':'المريض','th-id':'الكود','th-age':'العمر','th-phone':'الهاتف','th-blood':'فصيلة الدم','th-last':'آخر زيارة','th-status':'الحالة',
+    'flt-all':'جميع الحالات','flt-active':'نشط','flt-pending':'معلق','flt-inactive':'غير نشط',
+    'sh-personal':'المعلومات الشخصية','sh-medical':'التاريخ الطبي والأسناني','sh-admin':'المعلومات الإدارية',
+    'lbl-fname':'الاسم الأول *','lbl-lname':'الاسم الأخير *','lbl-dob':'تاريخ الميلاد','lbl-gender':'الجنس',
+    'lbl-phone':'رقم الهاتف','lbl-nid':'الرقم القومي','lbl-addr':'العنوان',
+    'lbl-blood':'فصيلة الدم','lbl-allergy':'الحساسية','lbl-conditions':'الأمراض المزمنة','lbl-complaint':'الشكوى الرئيسية',
+    'lbl-status':'الحالة','lbl-regdate':'تاريخ التسجيل',
+    'opt-select':'اختر...','opt-male':'ذكر','opt-female':'أنثى','opt-unk':'غير معروف',
+    'st-active':'نشط','st-pending':'معلق','st-inactive':'غير نشط',
+    'btn-clear':'مسح','btn-save-patient':'حفظ المريض',
+    'card-log-visit':'تسجيل زيارة جديدة','card-visit-history':'جميع الزيارات',
+    'lbl-v-patient':'المريض *','lbl-v-date':'تاريخ الزيارة *','lbl-v-proc':'الإجراء',
+    'lbl-v-tooth':'رقم السن','lbl-v-cost':'التكلفة (جنيه)','lbl-v-paid':'المدفوع (جنيه)',
+    'lbl-v-notes':'الملاحظات السريرية','lbl-v-next':'الموعد القادم','btn-save-visit':'حفظ الزيارة',
+    'vp-1':'فحص / تنظيف','vp-2':'خلع','vp-3':'حشو','vp-4':'علاج عصب',
+    'vp-5':'تاج / جسر','vp-6':'تبييض','vp-7':'تقويم','vp-8':'زراعة','vp-9':'أشعة','vp-10':'أخرى',
+    'card-export-title':'تصدير إلى Excel','card-import-title':'استيراد من Excel',
+    'export-desc':'حمّل جميع بيانات المرضى والزيارات كملف Excel منسّق.',
+    'import-desc':'استورد ملف Excel سابق. ستُضاف السجلات الجديدة بدون تكرار.',
+    'btn-download-excel':'تحميل Excel','btn-choose-file':'اختر ملفاً',
+    'reset-title':'إعادة تعيين شهرية','btn-monthly-reset':'إعادة تعيين للشهر الجديد',
+    'reset-desc':'إعادة تعيين جميع البيانات للشهر الجديد. سيتم تنزيل نسخة احتياطية أولاً. لا يمكن التراجع.',
+    'card-danger':'منطقة الخطر','danger-desc':'حذف جميع بيانات العيادة نهائياً. سيبقى حسابك.',
+    'btn-delete-account':'حذف جميع البيانات','btn-close-modal':'إغلاق',
+    'sb-sub':'عيادة الأسنان',
+    'nm-title':'إرسال تذكير بالموعد','nm-sub':'إشعار المريض بموعده القادم',
+    'nm-msg-label':'نص الرسالة','nm-wa-label':'إرسال عبر واتساب','nm-wa-sub':'يفتح واتساب ويب — اضغط إرسال',
+    'nm-sms-label':'إرسال عبر SMS','nm-sms-sub':'يفتح تطبيق الرسائل مع النص جاهزاً',
+    'nm-skip':'تخطّي — بدون إرسال',
+    'mni-dashboard-t':'الرئيسية','mni-patients-t':'المرضى','mni-add-t':'إضافة','mni-visits-t':'زيارات','mni-more-t':'المزيد',
+    'pt-search-ph':'ابحث بالاسم أو الهاتف أو الكود...',
+    'loading-text':'جارٍ تحميل بيانات العيادة...',
+    'err-fill-name':'يرجى إدخال الاسم الأول والأخير.','ok-patient-saved':'تم حفظ المريض.',
+    'err-sel-patient':'يرجى اختيار مريض.','err-sel-date':'يرجى إدخال التاريخ.',
+    'ok-visit-saved':'تم حفظ الزيارة.','ok-imported':'سجل تم استيراده.',
+    'err-no-data':'لا توجد بيانات للتصدير.','ok-excel-dl':'تم تنزيل Excel!',
+    'confirm-reset':'تنزيل نسخة احتياطية وحذف جميع بيانات هذا الشهر؟',
+    'ok-reset':'تم إعادة التعيين. تم تنزيل النسخة الاحتياطية.',
+    'confirm-del-patient':'حذف هذا المريض وجميع زياراته؟ لا يمكن التراجع.',
+    'ok-del-patient':'تم حذف المريض.',
+    'confirm-del-all':'حذف جميع بيانات العيادة نهائياً؟',
+    'ok-del-all':'تم حذف جميع البيانات.',
+    'no-visits-yet':'لا توجد زيارات مسجّلة بعد.',
+    'no-patients':'لا يوجد مرضى.',
+    'no-results':'لا توجد نتائج مطابقة.',
+    'syncing':'جارٍ المزامنة...','synced':'تمت المزامنة ✓','sync-err':'خطأ في المزامنة',
+    'leg-healthy':'سليم','leg-cavity':'تسوس','leg-filled':'حشو',
+    'leg-crown':'تاج / عصب','leg-missing':'مفقود','leg-other':'أخرى',
+    'dental-chart-hint':'اضغط على أي سن لإضافة تشخيص',
+    'btn-clear-chart':'مسح الكل','card-dental-chart':'خريطة الأسنان',
+    'vf-all-patients':'جميع المرضى','btn-print-visits-label':'طباعة',
+  }
+};
+function t(k){ return (T[lang]||T.en)[k]||k; }
+
+// ── HELPERS ──
+function pad(n){return String(n).padStart(2,'0');}
+function today(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function fmtDate(s){
+  if(!s)return'—';
+  const parts=String(s).split('-');
+  if(parts.length<3)return s;
+  const [y,m,d]=parts;
+  const ME=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MA=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return d+' '+(lang==='ar'?MA[+m-1]:ME[+m-1])+' '+y;
+}
+function calcAge(dob){
+  // Works for past AND future dates (babies not yet born, future DOB)
+  if(!dob)return'—';
+  const b=new Date(dob),n=new Date();
+  const diff=n-b; // ms, can be negative for future DOB
+  if(diff<0){
+    // Future birth date — show age as 0 or indicate unborn
+    return lang==='ar'?'(قادم)':'(future)';
+  }
+  let a=n.getFullYear()-b.getFullYear();
+  if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;
+  if(a<1){
+    // Less than 1 year — show months
+    const months=Math.floor(diff/(1000*60*60*24*30.44));
+    return months+(lang==='ar'?' شهر':' mo');
+  }
+  return a+(lang==='ar'?' سنة':' yrs');
+}
+function initials(p){return((p.fname||'')[0]||'').toUpperCase()+((p.lname||'')[0]||'').toUpperCase();}
+function normalizeStatus(s){
+  // Fix case-sensitivity issues from Firestore
+  if(!s)return'Active';
+  const m={'active':'Active','نشط':'Active','pending':'Pending','معلق':'Pending','inactive':'Inactive','غير نشط':'Inactive'};
+  return m[s.toLowerCase()]||s;
+}
+function badgeHtml(s){
+  const ns=normalizeStatus(s);
+  const m={Active:'b-active',Pending:'b-pending',Inactive:'b-inactive'};
+  const lbl={en:{Active:'Active',Pending:'Pending',Inactive:'Inactive'},ar:{Active:'نشط',Pending:'معلق',Inactive:'غير نشط'}};
+  return`<span class="badge ${m[ns]||'b-inactive'}">${(lbl[lang]||lbl.en)[ns]||ns}</span>`;
+}
+function showToast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show '+(type);
+  setTimeout(()=>{el.className='toast';},3200);
+}
+function showMsg(id,msg,ok){
+  const el=document.getElementById(id);if(!el)return;
+  el.textContent=msg;el.className='fmsg '+(ok?'ok':'err');
+  setTimeout(()=>{if(el)el.textContent='';},3500);
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function setSyncState(state){
+  ['sync-dot','mob-sync-dot'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.className='sync-dot'+(state==='syncing'?' syncing':state==='error'?' error':'');
+    el.title=t(state==='syncing'?'syncing':state==='error'?'sync-err':'synced');
+  });
+}
+
+// ── WIRE UP STATIC MODAL BUTTONS (fixes module scope issue) ──
+document.addEventListener('DOMContentLoaded',()=>{
+  // Notify modal buttons
+  document.getElementById('btn-nm-skip').addEventListener('click',()=>closeModal('notify-modal'));
+  document.getElementById('btn-nm-wa').addEventListener('click',()=>{
+    let phone=(_notifyPhone||'').replace(/\D/g,'');
+    if(phone.startsWith('0'))phone='20'+phone.slice(1);
+    else if(phone.length===10)phone='20'+phone;
+    window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(document.getElementById('nm-message').value),'_blank');
+  });
+  document.getElementById('btn-nm-sms').addEventListener('click',()=>{
+    let phone=(_notifyPhone||'').replace(/\D/g,'');
+    window.location.href='sms:'+phone+'?body='+encodeURIComponent(document.getElementById('nm-message').value);
+  });
+  document.getElementById('notify-modal').addEventListener('click',e=>{if(e.target.id==='notify-modal')closeModal('notify-modal');});
+
+  // Patient modal buttons
+  document.getElementById('btn-pt-modal-close').addEventListener('click',()=>closeModal('pt-modal'));
+  document.getElementById('btn-pt-modal-close2').addEventListener('click',()=>closeModal('pt-modal'));
+  document.getElementById('pt-modal').addEventListener('click',e=>{if(e.target.id==='pt-modal')closeModal('pt-modal');});
+  document.getElementById('btn-print-patient').addEventListener('click',()=>printPatient());
+  document.getElementById('btn-print-all-visits').addEventListener('click',()=>printAllVisits());
+
+  // Revenue reveal / hide toggle
+  document.getElementById('btn-rev-toggle').addEventListener('click',()=>{
+    if(revRevealed){
+      // Hide again — no password needed
+      revRevealed=false;
+      const revEl=document.getElementById('s-rev');
+      revEl.style.filter='blur(6px)';
+      document.getElementById('rev-eye-icon').innerHTML='<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>';
+      document.getElementById('btn-rev-toggle').title=lang==='ar'?'اضغط لعرض الإيرادات':'Click to show revenue';
+    } else {
+      // Show password modal
+      document.getElementById('rev-pass-err').textContent='';
+      document.getElementById('rev-pass-input').value='';
+      document.getElementById('rev-modal').classList.add('open');
+      setTimeout(()=>document.getElementById('rev-pass-input').focus(),100);
+    }
+  });
+  document.getElementById('btn-rev-modal-close').addEventListener('click',()=>closeModal('rev-modal'));
+  document.getElementById('btn-rev-cancel').addEventListener('click',()=>closeModal('rev-modal'));
+  document.getElementById('rev-modal').addEventListener('click',e=>{if(e.target.id==='rev-modal')closeModal('rev-modal');});
+  document.getElementById('rev-pass-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmReveal();});
+  document.getElementById('btn-rev-confirm').addEventListener('click',()=>confirmReveal());
+
+  // Tooth modal
+  document.getElementById('btn-tooth-modal-close').addEventListener('click',()=>closeModal('tooth-modal'));
+  document.getElementById('btn-tooth-cancel').addEventListener('click',()=>closeModal('tooth-modal'));
+  document.getElementById('btn-tooth-save').addEventListener('click',()=>saveToothDiagnosis());
+  document.getElementById('btn-tooth-clear').addEventListener('click',()=>clearToothDiagnosis());
+  document.getElementById('tooth-modal').addEventListener('click',e=>{if(e.target.id==='tooth-modal')closeModal('tooth-modal');});
+  document.getElementById('btn-clear-chart').addEventListener('click',()=>clearAllTeeth());
+
+  // Navigation buttons (sidebar)
+  document.querySelectorAll('.nav-item').forEach(btn=>{
+    if(!btn.getAttribute('onclick'))return;
+  });
+
+  // Auth enter key
+  document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')authAction();});
+  document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')authAction();});
+});
+
+// Print current patient modal
+let _printPatientId=null;
+function printPatient(){
+  const p=patients.find(x=>x._id===_printPatientId);if(!p)return;
+  const pv=visits.filter(v=>v.pid===_printPatientId).sort((a,b)=>b.date.localeCompare(a.date));
+  const dir=lang==='ar'?'rtl':'ltr';
+  const isAr=lang==='ar';
+  const ff=isAr?'Noto Kufi Arabic, Tahoma, Arial, sans-serif':'Arial, sans-serif';
+
+  const html=`<!DOCTYPE html>
+<html lang="${isAr?'ar':'en'}" dir="${dir}">
+<head>
+<meta charset="UTF-8">
+<title>${p.fname} ${p.lname}</title>
+${isAr?'<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">':''}
+<style>
+*{box-sizing:border-box;}
+body{font-family:${ff};direction:${dir};padding:32px;color:#1E3248;max-width:740px;margin:0 auto;font-size:13px;line-height:1.5;}
+h1{font-size:20px;color:#0F3460;margin:0 0 4px 0;font-weight:700;}
+.sub{font-size:12px;color:#8FA5BE;margin-bottom:24px;}
+.section{margin-bottom:22px;}
+.section-title{font-size:11px;font-weight:700;color:#1A5F9E;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid #E8F3FB;padding-bottom:6px;margin-bottom:12px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;}
+.field{margin-bottom:8px;}
+.label{font-size:10px;color:#8FA5BE;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.val{font-size:13px;color:#1E3248;margin-top:2px;}
+.visit{padding:10px 0;border-bottom:1px solid #EEF2F7;display:flex;gap:16px;align-items:flex-start;}
+.vdate{min-width:90px;font-size:12px;font-weight:700;color:#0F3460;}
+.vinfo{flex:1;font-size:12px;color:#4A6580;}
+.vcost{font-size:13px;font-weight:700;color:#2BBFA4;white-space:nowrap;}
+svg{display:block;max-width:100%;height:auto;}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+  @page{margin:20mm;size:A4;}
+}
+</style>
+</head>
+<body>
+<h1>Dr. Ayman Mostafa Alawady — ${isAr?'عيادة الأسنان':'Dental Clinic'}</h1>
+<div class="sub">${isAr?'تاريخ الطباعة:':'Printed:'} ${new Date().toLocaleDateString(isAr?'ar-EG':'en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+
+<div class="section">
+<div class="section-title">${isAr?'بيانات المريض':'Patient Information'}</div>
+<div class="grid">
+  <div class="field"><div class="label">${isAr?'الاسم':'Name'}</div><div class="val">${p.fname} ${p.lname}</div></div>
+  <div class="field"><div class="label">${isAr?'الكود':'ID'}</div><div class="val">${p.id||'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'تاريخ الميلاد':'Date of Birth'}</div><div class="val">${fmtDate(p.dob)}</div></div>
+  <div class="field"><div class="label">${isAr?'الجنس':'Gender'}</div><div class="val">${p.gender?(p.gender==='Male'?(isAr?'ذكر':'Male'):(isAr?'أنثى':'Female')):'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'الهاتف':'Phone'}</div><div class="val">${p.phone||'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'الرقم القومي':'National ID'}</div><div class="val">${p.nid||'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'فصيلة الدم':'Blood Type'}</div><div class="val" style="font-weight:700;color:#D94040;">${p.blood||'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'الحالة':'Status'}</div><div class="val">${normalizeStatus(p.status)}</div></div>
+  <div class="field" style="grid-column:1/-1"><div class="label">${isAr?'العنوان':'Address'}</div><div class="val">${p.address||'—'}</div></div>
+</div></div>
+
+<div class="section">
+<div class="section-title">${isAr?'التاريخ الطبي':'Medical History'}</div>
+<div class="grid">
+  <div class="field"><div class="label">${isAr?'الحساسية':'Allergies'}</div><div class="val">${p.allergy||'—'}</div></div>
+  <div class="field"><div class="label">${isAr?'الأمراض المزمنة':'Conditions'}</div><div class="val">${p.conditions||'—'}</div></div>
+  <div class="field" style="grid-column:1/-1"><div class="label">${isAr?'الشكوى الرئيسية':'Chief Complaint'}</div><div class="val">${p.complaint||'—'}</div></div>
+</div></div>
+
+${pv.length?`<div class="section">
+<div class="section-title">${isAr?'سجل الزيارات':'Visit History'} (${pv.length})</div>
+${pv.map(v=>`<div class="visit"><div class="vdate">${fmtDate(v.date)}</div><div class="vinfo">${v.proc||''}${v.tooth?' · '+v.tooth:''}${v.notes?' — '+v.notes:''}</div><div class="vcost">${v.cost&&+v.cost?'EGP '+Number(v.cost).toLocaleString():''}</div></div>`).join('')}
+</div>`:''}
+
+${buildChartDiagTable(_printPatientId, dir)}
+
+<script>
+function doPrint(){
+  if(document.fonts&&document.fonts.ready){
+    document.fonts.ready.then(function(){setTimeout(function(){window.print();},400);});
+  }else{setTimeout(function(){window.print();},1200);}
+}
+window.onload=doPrint;
+<\/script>
+</body></html>`;
+
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(win){setTimeout(()=>URL.revokeObjectURL(url),30000);}
+  else{const a=document.createElement('a');a.href=url;a.target='_blank';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+}
+
+// ── LANGUAGE ──
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  Object.keys(T.en).forEach(k=>{
+    const el=document.getElementById(k);if(!el)return;
+    if((el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.type!=='submit') el.placeholder=t(k);
+    else el.textContent=t(k);
+  });
+  const ps=document.getElementById('pt-search');if(ps)ps.placeholder=t('pt-search-ph');
+  if(currentUser){renderPatients();renderVisits();updateDash();}
+}
+window.toggleLang=function(){
+  lang=lang==='en'?'ar':'en';
+  localStorage.setItem('dc_lang',lang);
+  applyLang();
+};
+
+// ── AUTH MODE ──
+let authMode='login';
+window.toggleAuthMode=function(){
+  authMode=authMode==='login'?'register':'login';
+  const isReg=authMode==='register';
+  document.getElementById('pass2-group').style.display=isReg?'block':'none';
+  document.getElementById('auth-btn-text').textContent=isReg?(lang==='ar'?'إنشاء حساب':'Register'):(lang==='ar'?'تسجيل الدخول':'Sign in');
+  document.getElementById('toggle-text').textContent=isReg?(lang==='ar'?'لديك حساب بالفعل؟':"Already have an account?"):(lang==='ar'?'ليس لديك حساب؟':"Don't have an account?");
+  document.getElementById('toggle-link').textContent=isReg?(lang==='ar'?' تسجيل الدخول':' Sign in'):(lang==='ar'?' إنشاء حساب':' Register');
+  document.getElementById('auth-err').textContent='';
+  document.getElementById('auth-err').className='auth-err';
+};
+
+function setAuthErr(msg,ok=false){
+  const el=document.getElementById('auth-err');
+  el.textContent=msg;
+  el.className='auth-err '+(ok?'ok':'err');
+}
+
+window.authAction=async function(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  const btn=document.getElementById('auth-action-btn');
+  if(!email||!pass){setAuthErr(lang==='ar'?'يرجى ملء جميع الحقول':'Please fill all fields.');return;}
+  btn.disabled=true;
+  try{
+    if(authMode==='register'){
+      const pass2=document.getElementById('auth-pass2').value;
+      if(pass!==pass2){setAuthErr(lang==='ar'?'كلمتا المرور غير متطابقتين':'Passwords do not match.');btn.disabled=false;return;}
+      if(pass.length<6){setAuthErr(lang==='ar'?'كلمة المرور يجب أن تكون 6 أحرف على الأقل':'Password must be at least 6 characters.');btn.disabled=false;return;}
+      await createUserWithEmailAndPassword(_fbAuth,email,pass);
+    } else {
+      await signInWithEmailAndPassword(_fbAuth,email,pass);
+    }
+  } catch(e){
+    const msgs={
+      'auth/email-already-in-use': lang==='ar'?'البريد الإلكتروني مستخدم بالفعل':'Email already in use.',
+      'auth/invalid-email': lang==='ar'?'بريد إلكتروني غير صالح':'Invalid email address.',
+      'auth/user-not-found': lang==='ar'?'لا يوجد حساب بهذا البريد':'No account found with this email.',
+      'auth/wrong-password': lang==='ar'?'كلمة المرور غير صحيحة':'Wrong password.',
+      'auth/invalid-credential': lang==='ar'?'البريد الإلكتروني أو كلمة المرور غير صحيحة':'Invalid email or password.',
+      'auth/too-many-requests': lang==='ar'?'محاولات كثيرة. حاول لاحقاً':'Too many attempts. Try later.',
+      'auth/weak-password': lang==='ar'?'كلمة المرور ضعيفة جداً':'Password is too weak.',
+    };
+    setAuthErr(msgs[e.code]||e.message);
+    btn.disabled=false;
+  }
+};
+
+// ── AUTH STATE ──
+// auth and db are set globally by waitForFirebase()
+// All functions use these globals directly
+onAuthStateChanged(_fbAuth, async user=>{
+  clearTimeout(_loadTimeout);
+  document.getElementById('loading-screen').style.display='none';
+  if(user){
+    currentUser=user;
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('sf-email').textContent=user.email;
+    document.getElementById('a-regdate').value=today();
+    document.getElementById('v-date').value=today();
+    // Date constraints: DOB must be past, visit date must be today or future
+    document.getElementById('a-dob').max=today();
+    document.getElementById('v-date').min=today();
+    document.getElementById('v-next').min=today();
+    document.getElementById('tb-date').textContent=new Date().toLocaleDateString(lang==='ar'?'ar-EG':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    applyLang();
+    subscribeToData();
+  } else {
+    currentUser=null;
+    if(unsubPatients){unsubPatients();unsubPatients=null;}
+    if(unsubVisits){unsubVisits();unsubVisits=null;}
+    patients=[];visits=[];
+    document.getElementById('app-screen').style.display='none';
+    document.getElementById('auth-screen').style.display='block';
+    document.getElementById('auth-action-btn').disabled=false;
+  }
+});
+
+window.logout=async function(){
+  await signOut(_fbAuth);
+};
+
+// ── FIRESTORE REALTIME LISTENERS ──
+function subscribeToData(){
+  const uid=currentUser.uid;
+  setSyncState('syncing');
+
+  // Patients
+  const pRef=collection(_fbDb,`users/${uid}/patients`);
+  unsubPatients=onSnapshot(query(pRef,orderBy('regdate','desc')), snap=>{
+    patients=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    setSyncState('synced');
+    updateDash();
+    renderPatients();
+    updateVPatient();
+  }, ()=>setSyncState('error'));
+
+  // Visits
+  const vRef=collection(_fbDb,`users/${uid}/visits`);
+  unsubVisits=onSnapshot(query(vRef,orderBy('date','desc')), snap=>{
+    visits=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    setSyncState('synced');
+    renderVisits();
+    updateDash();
+  }, ()=>setSyncState('error'));
+}
+
+// ── NAVIGATION ──
+const MOB_NAMES={dashboard:{en:'Dashboard',ar:'لوحة التحكم'},patients:{en:'Patients',ar:'المرضى'},'add-patient':{en:'Add Patient',ar:'إضافة مريض'},visits:{en:'Visit Log',ar:'سجل الزيارات'},export:{en:'Export / Import',ar:'تصدير / استيراد'},settings:{en:'Settings',ar:'الإعدادات'}};
+window.setMobActive=function(key){
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('mni-'+key);if(el)el.classList.add('active');
+};
+window.goTo=function(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const names=MOB_NAMES[page];
+  const mp=document.getElementById('mob-page-title');
+  if(mp&&names)mp.textContent=names[lang]||names.en;
+  if(page==='patients')renderPatients();
+  if(page==='visits'){updateVPatient();renderVisits();}
+  if(page==='dashboard')updateDash();
+};
+
+// ── REVENUE REVEAL ──
+let revRevealed=false;
+function updateDash(){
+  document.getElementById('s-total').textContent=patients.length;
+  document.getElementById('s-active').textContent=patients.filter(p=>normalizeStatus(p.status)==='Active').length;
+  document.getElementById('s-visits').textContent=visits.length;
+  const rev=visits.reduce((a,v)=>a+(+v.cost||0),0);
+  const revEl=document.getElementById('s-rev');
+  if(revRevealed){
+    revEl.textContent=rev.toLocaleString();
+    revEl.style.filter='none';
+  } else {
+    revEl.textContent=rev.toLocaleString(); // store real value but blurred
+    revEl.style.filter='blur(6px)';
+  }
+  const el=document.getElementById('dash-recent');
+  const recent=patients.slice(0,8);
+  if(!recent.length){el.innerHTML=`<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg><strong>${t('no-patients')}</strong><p></p></div>`;return;}
+  el.innerHTML=`<table><thead><tr><th>${t('th-patient')}</th><th class="hide-mobile">${t('th-phone')}</th><th>${t('th-status')}</th><th class="hide-mobile">${t('lbl-regdate')}</th></tr></thead><tbody>${recent.map(p=>`<tr><td><div class="pt-cell"><div class="avatar">${initials(p)}</div><div class="pt-main">${p.fname} ${p.lname}</div></div></td><td class="hide-mobile" style="font-size:12px;">${p.phone||'—'}</td><td>${badgeHtml(p.status)}</td><td class="hide-mobile" style="font-size:12px;color:var(--gray-400);">${fmtDate(p.regdate)}</td></tr>`).join('')}</tbody></table>`;
+}
+function confirmReveal(){
+  const pass=document.getElementById('rev-pass-input').value;
+  signInWithEmailAndPassword(_fbAuth,currentUser.email,pass)
+    .then(()=>{
+      revRevealed=true;
+      const revEl=document.getElementById('s-rev');
+      revEl.style.filter='none';
+      // Change to eye-slash (click again to hide)
+      document.getElementById('rev-eye-icon').innerHTML='<path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"/><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>';
+      document.getElementById('btn-rev-toggle').title=lang==='ar'?'اضغط لإخفاء الإيرادات':'Click to hide revenue';
+      document.getElementById('rev-pass-input').value='';
+      document.getElementById('rev-pass-err').textContent='';
+      closeModal('rev-modal');
+    })
+    .catch(()=>{
+      document.getElementById('rev-pass-err').textContent=lang==='ar'?'كلمة المرور غير صحيحة':'Wrong password.';
+    });
+}
+
+// ── DENTAL CHART ──
+// Universal Numbering System (1-32): upper right→left, lower left→right
+const TOOTH_DATA=[
+  // Upper jaw (1-16), displayed as arch top
+  {n:1,name:'Upper Right 3rd Molar (Wisdom)',type:'molar'},
+  {n:2,name:'Upper Right 2nd Molar',type:'molar'},
+  {n:3,name:'Upper Right 1st Molar',type:'molar'},
+  {n:4,name:'Upper Right 2nd Premolar',type:'premolar'},
+  {n:5,name:'Upper Right 1st Premolar',type:'premolar'},
+  {n:6,name:'Upper Right Canine',type:'canine'},
+  {n:7,name:'Upper Right Lateral Incisor',type:'incisor'},
+  {n:8,name:'Upper Right Central Incisor',type:'incisor'},
+  {n:9,name:'Upper Left Central Incisor',type:'incisor'},
+  {n:10,name:'Upper Left Lateral Incisor',type:'incisor'},
+  {n:11,name:'Upper Left Canine',type:'canine'},
+  {n:12,name:'Upper Left 1st Premolar',type:'premolar'},
+  {n:13,name:'Upper Left 2nd Premolar',type:'premolar'},
+  {n:14,name:'Upper Left 1st Molar',type:'molar'},
+  {n:15,name:'Upper Left 2nd Molar',type:'molar'},
+  {n:16,name:'Upper Left 3rd Molar (Wisdom)',type:'molar'},
+  // Lower jaw (17-32), displayed as arch bottom
+  {n:17,name:'Lower Left 3rd Molar (Wisdom)',type:'molar'},
+  {n:18,name:'Lower Left 2nd Molar',type:'molar'},
+  {n:19,name:'Lower Left 1st Molar',type:'molar'},
+  {n:20,name:'Lower Left 2nd Premolar',type:'premolar'},
+  {n:21,name:'Lower Left 1st Premolar',type:'premolar'},
+  {n:22,name:'Lower Left Canine',type:'canine'},
+  {n:23,name:'Lower Left Lateral Incisor',type:'incisor'},
+  {n:24,name:'Lower Left Central Incisor',type:'incisor'},
+  {n:25,name:'Lower Right Central Incisor',type:'incisor'},
+  {n:26,name:'Lower Right Lateral Incisor',type:'incisor'},
+  {n:27,name:'Lower Right Canine',type:'canine'},
+  {n:28,name:'Lower Right 1st Premolar',type:'premolar'},
+  {n:29,name:'Lower Right 2nd Premolar',type:'premolar'},
+  {n:30,name:'Lower Right 1st Molar',type:'molar'},
+  {n:31,name:'Lower Right 2nd Molar',type:'molar'},
+  {n:32,name:'Lower Right 3rd Molar (Wisdom)',type:'molar'},
+];
+
+// Arabic names
+const TOOTH_NAMES_AR={
+  1:'الضرس الثالث العلوي الأيمن (العقل)',2:'الضرس الثاني العلوي الأيمن',3:'الضرس الأول العلوي الأيمن',
+  4:'الضاحك الثاني العلوي الأيمن',5:'الضاحك الأول العلوي الأيمن',6:'الناب العلوي الأيمن',
+  7:'القاطع الجانبي العلوي الأيمن',8:'القاطع المركزي العلوي الأيمن',
+  9:'القاطع المركزي العلوي الأيسر',10:'القاطع الجانبي العلوي الأيسر',11:'الناب العلوي الأيسر',
+  12:'الضاحك الأول العلوي الأيسر',13:'الضاحك الثاني العلوي الأيسر',
+  14:'الضرس الأول العلوي الأيسر',15:'الضرس الثاني العلوي الأيسر',16:'الضرس الثالث العلوي الأيسر (العقل)',
+  17:'الضرس الثالث السفلي الأيسر (العقل)',18:'الضرس الثاني السفلي الأيسر',19:'الضرس الأول السفلي الأيسر',
+  20:'الضاحك الثاني السفلي الأيسر',21:'الضاحك الأول السفلي الأيسر',22:'الناب السفلي الأيسر',
+  23:'القاطع الجانبي السفلي الأيسر',24:'القاطع المركزي السفلي الأيسر',
+  25:'القاطع المركزي السفلي الأيمن',26:'القاطع الجانبي السفلي الأيمن',27:'الناب السفلي الأيمن',
+  28:'الضاحك الأول السفلي الأيمن',29:'الضاحك الثاني السفلي الأيمن',
+  30:'الضرس الأول السفلي الأيمن',31:'الضرس الثاني السفلي الأيمن',32:'الضرس الثالث السفلي الأيمن (العقل)'
+};
+
+const CONDITION_COLORS={
+  '':   {fill:'#EBF3FB',stroke:'#1A5F9E',label:'Healthy'},
+  cavity:{fill:'#FDEAEA',stroke:'#D94040',label:'Cavity'},
+  filled:{fill:'#E0F7F3',stroke:'#2BBFA4',label:'Filled'},
+  crown: {fill:'#FEF3DC',stroke:'#E8A020',label:'Crown'},
+  rootcanal:{fill:'#FEF3DC',stroke:'#E8A020',label:'Root Canal'},
+  extracted:{fill:'#EEF2F7',stroke:'#8FA5BE',label:'Missing'},
+  implant:{fill:'#E8F3FB',stroke:'#0F3460',label:'Implant'},
+  bridge:{fill:'#FEF3DC',stroke:'#E8A020',label:'Bridge'},
+  other:{fill:'#E8F3FB',stroke:'#0F3460',label:'Other'},
+};
+
+let toothDiagnoses={}; // {pid: {toothNum: {condition, notes}}}  — per patient
+let activeToothNum=null;
+let activeToothPid=null; // which patient's chart is being edited
+
+function getPatientDiagnoses(pid){
+  if(!pid) return {};
+  if(!toothDiagnoses[pid]) toothDiagnoses[pid]={};
+  return toothDiagnoses[pid];
+}
+
+function getToothColor(n, pid){
+  const diags=getPatientDiagnoses(pid||activeToothPid);
+  const d=diags[n];
+  const cond=d?d.condition:'';
+  return CONDITION_COLORS[cond]||CONDITION_COLORS[''];
+}
+
+// Get merged tooth diagnoses for a patient from all their saved visits
+function getMergedDiagnoses(pid){
+  if(!pid) return {};
+  const merged={};
+  // Get visits sorted oldest→newest so newest overwrites
+  const pvs=[...visits].filter(v=>v.pid===pid).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  pvs.forEach(v=>{
+    if(v.toothDiag){
+      try{
+        const d=typeof v.toothDiag==='string'?JSON.parse(v.toothDiag):v.toothDiag;
+        // Keys may be strings ("8") — normalise to numbers
+        Object.entries(d).forEach(([k,val])=>{
+          if(val&&(val.condition||val.notes)) merged[+k]=val;
+        });
+      }catch(e){}
+    }
+  });
+  // Also overlay current in-memory diagnoses (not yet saved)
+  const live=toothDiagnoses[pid]||{};
+  Object.entries(live).forEach(([k,val])=>{ merged[+k]=val; });
+  return merged;
+}
+
+function buildDentalChart(){
+  const svg=document.getElementById('dental-svg');
+  if(!svg)return;
+  const pid=document.getElementById('v-patient').value;
+  activeToothPid=pid||null;
+  // Pre-fill in-memory diagnoses from saved visits so live chart shows history
+  if(pid && (!toothDiagnoses[pid]||Object.keys(toothDiagnoses[pid]).length===0)){
+    const saved=getMergedDiagnoses(pid);
+    if(Object.keys(saved).length>0) toothDiagnoses[pid]=saved;
+  }
+  _buildChartInto(svg, pid);
+}
+
+// Reusable: build chart SVG into an existing element (for live chart or print)
+function _buildChartInto(svg, pid, interactive){
+  if(interactive===undefined) interactive=true;
+  svg.innerHTML='';
+  const W=520,H=420;
+  const upperCx=W/2, upperCy=105, upperRx=190, upperRy=80;
+  const lowerCx=W/2, lowerCy=315, lowerRx=190, lowerRy=80;
+
+  function archPos(index,total,cx,cy,rx,ry,startAngle,endAngle){
+    const t2=index/(total-1);
+    const angle=startAngle+(endAngle-startAngle)*t2;
+    const rad=angle*Math.PI/180;
+    return{x:cx+rx*Math.cos(rad), y:cy+ry*Math.sin(rad)};
+  }
+
+  const lblU=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lblU.setAttribute('x',W/2);lblU.setAttribute('y',upperCy);
+  lblU.setAttribute('text-anchor','middle');lblU.setAttribute('dominant-baseline','middle');
+  lblU.setAttribute('font-size','13');lblU.setAttribute('font-weight','600');
+  lblU.setAttribute('fill','#8FA5BE');lblU.setAttribute('font-family','DM Sans,Arial,sans-serif');
+  lblU.textContent=lang==='ar'?'الفك العلوي':'Upper';
+  svg.appendChild(lblU);
+
+  const lblL=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lblL.setAttribute('x',W/2);lblL.setAttribute('y',lowerCy);
+  lblL.setAttribute('text-anchor','middle');lblL.setAttribute('dominant-baseline','middle');
+  lblL.setAttribute('font-size','13');lblL.setAttribute('font-weight','600');
+  lblL.setAttribute('fill','#8FA5BE');lblL.setAttribute('font-family','DM Sans,Arial,sans-serif');
+  lblL.textContent=lang==='ar'?'الفك السفلي':'Lower';
+  svg.appendChild(lblL);
+
+  function toothSize(type){
+    if(type==='molar')return{w:22,h:20};
+    if(type==='premolar')return{w:17,h:16};
+    if(type==='canine')return{w:14,h:18};
+    return{w:13,h:16};
+  }
+
+  const diags=getPatientDiagnoses(pid);
+
+  function drawTooth(tooth, pos, interactive, isUpper){
+    const sz=toothSize(tooth.type);
+    const d2=diags[tooth.n];
+    const cond=d2?d2.condition:'';
+    const col=CONDITION_COLORS[cond]||CONDITION_COLORS[''];
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    if(interactive) g.setAttribute('cursor','pointer');
+    g.setAttribute('data-tooth',tooth.n);
+
+    // Tooth rectangle
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',pos.x-sz.w/2);rect.setAttribute('y',pos.y-sz.h/2);
+    rect.setAttribute('width',sz.w);rect.setAttribute('height',sz.h);
+    rect.setAttribute('rx','4');
+    rect.setAttribute('fill',col.fill);rect.setAttribute('stroke',col.stroke);
+    rect.setAttribute('stroke-width',d2?'2':'1.5');
+
+    // Tooth number
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',pos.x);txt.setAttribute('y',pos.y+1);
+    txt.setAttribute('text-anchor','middle');txt.setAttribute('dominant-baseline','middle');
+    txt.setAttribute('font-size','8');txt.setAttribute('fill',col.stroke);
+    txt.setAttribute('font-family','DM Sans,Arial,sans-serif');txt.setAttribute('font-weight','700');
+    txt.textContent=tooth.n;
+
+    g.appendChild(rect);g.appendChild(txt);
+
+    // Condition label outside tooth (above for upper jaw, below for lower jaw)
+    if(d2&&d2.condition){
+      const condLabel=col.label; // short english label
+      const labelY=isUpper ? pos.y-sz.h/2-4 : pos.y+sz.h/2+10;
+      const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x',pos.x);lbl.setAttribute('y',labelY);
+      lbl.setAttribute('text-anchor','middle');lbl.setAttribute('dominant-baseline','auto');
+      lbl.setAttribute('font-size','6.5');lbl.setAttribute('fill',col.stroke);
+      lbl.setAttribute('font-family','DM Sans,Arial,sans-serif');lbl.setAttribute('font-weight','600');
+      lbl.setAttribute('opacity','0.9');
+      // Truncate label to 6 chars max to avoid overlap
+      lbl.textContent=condLabel.length>6?condLabel.slice(0,5)+'…':condLabel;
+      g.appendChild(lbl);
+    }
+
+    // Dot indicator if has notes
+    if(d2&&d2.notes){
+      const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx',pos.x+sz.w/2-2);dot.setAttribute('cy',pos.y-sz.h/2+2);
+      dot.setAttribute('r','2.5');dot.setAttribute('fill',col.stroke);
+      g.appendChild(dot);
+    }
+
+    if(interactive) g.addEventListener('click',()=>openToothModal(tooth.n));
+    const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent='#'+tooth.n+(d2&&d2.condition?' — '+col.label:'')+(d2&&d2.notes?' | '+d2.notes:'');
+    g.appendChild(title);
+    svg.appendChild(g);
+  }
+
+  for(let i=0;i<16;i++){
+    const tooth=TOOTH_DATA[i];
+    const pos=archPos(i,16,upperCx,upperCy,upperRx,upperRy,180,0);
+    drawTooth(tooth, pos, interactive, true);
+  }
+  for(let i=0;i<16;i++){
+    const tooth=TOOTH_DATA[16+i];
+    const pos=archPos(i,16,lowerCx,lowerCy,lowerRx,lowerRy,180,360);
+    drawTooth(tooth, pos, interactive, false);
+  }
+}
+
+// Generate chart SVG as a pure HTML string — accepts diags object directly
+function buildChartSvgString(pidOrDiags){
+  const W=520, H=420;
+  const upperCx=W/2, upperCy=105, upperRx=190, upperRy=80;
+  const lowerCx=W/2, lowerCy=315, lowerRx=190, lowerRy=80;
+  const diags=typeof pidOrDiags==='object'&&pidOrDiags!==null&&!('_id' in pidOrDiags)
+    ? pidOrDiags
+    : getMergedDiagnoses(pidOrDiags);
+  const isAr=lang==='ar';
+
+  function archPos(index,total,cx,cy,rx,ry,startAngle,endAngle){
+    const t=index/(total-1);
+    const angle=startAngle+(endAngle-startAngle)*t;
+    const rad=angle*Math.PI/180;
+    return{x:cx+rx*Math.cos(rad), y:cy+ry*Math.sin(rad)};
+  }
+
+  function sz(type){
+    if(type==='molar')return{w:22,h:20};
+    if(type==='premolar')return{w:17,h:16};
+    if(type==='canine')return{w:14,h:18};
+    return{w:13,h:16};
+  }
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  function toothSvg(tooth, pos, isUpper){
+    const s=sz(tooth.type);
+    const d2=diags[tooth.n];
+    const cond=d2?d2.condition:'';
+    const col=CONDITION_COLORS[cond]||CONDITION_COLORS[''];
+    const sw=d2?2:1.5;
+    const x=pos.x-s.w/2, y=pos.y-s.h/2;
+    let inner=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${s.w}" height="${s.h}" rx="4" fill="${col.fill}" stroke="${col.stroke}" stroke-width="${sw}"/>`;
+    inner+=`<text x="${pos.x.toFixed(1)}" y="${(pos.y+1).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="${col.stroke}" font-family="Arial,sans-serif">${tooth.n}</text>`;
+    if(d2&&d2.condition){
+      const labelY=isUpper?y-4:y+s.h+10;
+      const lbl=col.label.length>6?col.label.slice(0,5)+'…':col.label;
+      inner+=`<text x="${pos.x.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="6.5" font-weight="600" fill="${col.stroke}" font-family="Arial,sans-serif" opacity="0.9">${esc(lbl)}</text>`;
+    }
+    if(d2&&d2.notes){
+      inner+=`<circle cx="${(pos.x+s.w/2-2).toFixed(1)}" cy="${(y+2).toFixed(1)}" r="2.5" fill="${col.stroke}"/>`;
+    }
+    return `<g data-tooth="${tooth.n}">${inner}</g>`;
+  }
+
+  let teeth='';
+  for(let i=0;i<16;i++){
+    const tooth=TOOTH_DATA[i];
+    const pos=archPos(i,16,upperCx,upperCy,upperRx,upperRy,180,0);
+    teeth+=toothSvg(tooth,pos,true);
+  }
+  for(let i=0;i<16;i++){
+    const tooth=TOOTH_DATA[16+i];
+    const pos=archPos(i,16,lowerCx,lowerCy,lowerRx,lowerRy,180,360);
+    teeth+=toothSvg(tooth,pos,false);
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;height:auto;display:block;margin:0 auto;">
+  <text x="${W/2}" y="${upperCy}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="600" fill="#8FA5BE" font-family="Arial,sans-serif">${isAr?'الفك العلوي':'Upper'}</text>
+  <text x="${W/2}" y="${lowerCy}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="600" fill="#8FA5BE" font-family="Arial,sans-serif">${isAr?'الفك السفلي':'Lower'}</text>
+  ${teeth}
+</svg>`;
+}
+
+// Build chart section for print — uses merged diagnoses from all visits
+function buildChartDiagTable(pid, dir){
+  const diags=getMergedDiagnoses(pid);
+  const diagEntries=Object.entries(diags)
+    .filter(([,d])=>d&&(d.condition||d.notes))
+    .sort((a,b)=>+a[0]- +b[0]);
+
+  const COND_LABELS_AR={
+    cavity:'تسوس', filled:'حشو', crown:'تاج', rootcanal:'علاج عصب',
+    extracted:'مفقود / مخلوع', implant:'زرعة', bridge:'جسر', other:'أخرى', '':'سليم'
+  };
+
+  const rows=diagEntries.map(([n,d])=>{
+    const td2=TOOTH_DATA.find(x=>x.n===+n);
+    if(!td2)return'';
+    const name=lang==='ar'?(TOOTH_NAMES_AR[+n]||td2.name):td2.name;
+    const col=CONDITION_COLORS[d.condition]||CONDITION_COLORS[''];
+    const condLabel=lang==='ar'?(COND_LABELS_AR[d.condition||'']||d.condition||'—'):col.label||'—';
+    return`<tr>
+      <td style="font-weight:700;color:#0F3460;padding:8px 12px;border-bottom:1px solid #EEF2F7;white-space:nowrap;">#${n}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #EEF2F7;color:#1E3248;">${name}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #EEF2F7;">
+        <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${col.fill};color:${col.stroke};border:1.5px solid ${col.stroke};">${condLabel}</span>
+      </td>
+      <td style="padding:8px 12px;border-bottom:1px solid #EEF2F7;color:#4A6580;font-size:12px;">${d.notes||'—'}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+
+  const tableHtml=rows?`
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;">
+      <thead>
+        <tr style="background:#F7F9FC;">
+          <th style="padding:8px 12px;text-align:${dir==='rtl'?'right':'left'};font-size:10px;color:#8FA5BE;font-weight:700;text-transform:uppercase;border-bottom:1.5px solid #D9E3EE;">#</th>
+          <th style="padding:8px 12px;text-align:${dir==='rtl'?'right':'left'};font-size:10px;color:#8FA5BE;font-weight:700;text-transform:uppercase;border-bottom:1.5px solid #D9E3EE;">${lang==='ar'?'اسم السن':'Tooth'}</th>
+          <th style="padding:8px 12px;text-align:${dir==='rtl'?'right':'left'};font-size:10px;color:#8FA5BE;font-weight:700;text-transform:uppercase;border-bottom:1.5px solid #D9E3EE;">${lang==='ar'?'الحالة':'Condition'}</th>
+          <th style="padding:8px 12px;text-align:${dir==='rtl'?'right':'left'};font-size:10px;color:#8FA5BE;font-weight:700;text-transform:uppercase;border-bottom:1.5px solid #D9E3EE;">${lang==='ar'?'التشخيص':'Diagnosis / Notes'}</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`:'';
+
+  return `
+    <div style="margin-top:20px;">
+      <div style="font-size:11px;font-weight:700;color:#1A5F9E;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid #E8F3FB;padding-bottom:7px;margin-bottom:16px;">${lang==='ar'?'خريطة الأسنان':'Dental Chart'}</div>
+      <div style="max-width:480px;margin:0 auto 12px;">${buildChartSvgString(diags)}</div>
+      ${tableHtml}
+    </div>`;
+}
+
+// Condition options with labels in both languages
+const CONDITION_OPTIONS=[
+  {value:'',     en:'Healthy',           ar:'سليم'},
+  {value:'cavity',en:'Cavity',           ar:'تسوس'},
+  {value:'filled',en:'Filled',           ar:'حشو'},
+  {value:'crown', en:'Crown',            ar:'تاج'},
+  {value:'rootcanal',en:'Root Canal',    ar:'علاج عصب'},
+  {value:'extracted',en:'Extracted / Missing',ar:'مخلوع / مفقود'},
+  {value:'implant',en:'Implant',         ar:'زرعة'},
+  {value:'bridge',en:'Bridge',           ar:'جسر'},
+  {value:'other', en:'Other',            ar:'أخرى'},
+];
+
+function updateToothColorPreview(){
+  const cond=document.getElementById('tooth-condition').value;
+  const col=CONDITION_COLORS[cond]||CONDITION_COLORS[''];
+  // Update color badge in modal
+  const badge=document.getElementById('tooth-color-badge');
+  if(badge){
+    badge.style.background=col.fill;
+    badge.style.borderColor=col.stroke;
+    // Show condition name inside badge
+    badge.title=col.label;
+  }
+  // Live-update the tooth in the SVG chart if visible
+  if(activeToothNum){
+    const g=document.querySelector(`[data-tooth="${activeToothNum}"]`);
+    if(g){
+      const rect=g.querySelector('rect');
+      const txt=g.querySelector('text');
+      if(rect){rect.setAttribute('fill',col.fill);rect.setAttribute('stroke',col.stroke);rect.setAttribute('stroke-width',cond?'2':'1.5');}
+      if(txt){txt.setAttribute('fill',col.stroke);}
+    }
+  }
+}
+
+function openToothModal(n){
+  activeToothNum=n;
+  activeToothPid=document.getElementById('v-patient').value||null;
+  const td2=TOOTH_DATA.find(x=>x.n===n);
+
+  // Set title and tooth name
+  const titleEl=document.getElementById('tooth-modal-title');
+  if(titleEl) titleEl.innerHTML=(lang==='ar'?'السن #':'Tooth #')+'<span id="tooth-modal-num">'+n+'</span>';
+  document.getElementById('tooth-modal-name-label').textContent=lang==='ar'?'اسم السن':'Tooth name';
+  document.getElementById('tooth-modal-name').textContent=lang==='ar'?(TOOTH_NAMES_AR[n]||td2.name):td2.name;
+
+  // Populate condition dropdown with current language labels
+  const sel=document.getElementById('tooth-condition');
+  sel.innerHTML=CONDITION_OPTIONS.map(o=>`<option value="${o.value}">${lang==='ar'?o.ar:o.en}</option>`).join('');
+
+  // Load existing data
+  const diags=getPatientDiagnoses(activeToothPid);
+  const existing=diags[n]||{condition:'',notes:''};
+  sel.value=existing.condition||'';
+  document.getElementById('tooth-notes').value=existing.notes||'';
+
+  // Update color preview
+  updateToothColorPreview();
+
+  // Translate labels and buttons
+  document.getElementById('tooth-condition-label').textContent=lang==='ar'?'الحالة':'Condition';
+  document.getElementById('tooth-notes-label').textContent=lang==='ar'?'التشخيص / الملاحظات':'Diagnosis / Notes';
+  document.getElementById('btn-tooth-save').textContent=lang==='ar'?'حفظ':'Save';
+  document.getElementById('btn-tooth-cancel').textContent=lang==='ar'?'إلغاء':'Cancel';
+  document.getElementById('btn-tooth-clear').textContent=lang==='ar'?'مسح':'Clear';
+
+  document.getElementById('tooth-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('tooth-notes').focus(),100);
+}
+
+function saveToothDiagnosis(){
+  const cond=document.getElementById('tooth-condition').value;
+  const notes=document.getElementById('tooth-notes').value.trim();
+  const diags=getPatientDiagnoses(activeToothPid);
+  if(cond||notes){
+    diags[activeToothNum]={condition:cond,notes};
+  } else {
+    delete diags[activeToothNum];
+  }
+  closeModal('tooth-modal');
+  buildDentalChart();
+}
+
+function clearToothDiagnosis(){
+  const diags=getPatientDiagnoses(activeToothPid);
+  delete diags[activeToothNum];
+  document.getElementById('tooth-condition').value='';
+  document.getElementById('tooth-notes').value='';
+  closeModal('tooth-modal');
+  buildDentalChart();
+}
+
+function clearAllTeeth(){
+  const pid=document.getElementById('v-patient').value||null;
+  const diags=getPatientDiagnoses(pid);
+  if(!Object.keys(diags).length)return;
+  if(!confirm(lang==='ar'?'مسح جميع تشخيصات الأسنان؟':'Clear all tooth diagnoses?'))return;
+  if(pid) toothDiagnoses[pid]={};
+  buildDentalChart();
+}
+
+// Build chart when visiting page
+const _origGoTo=window.goTo;
+window.goTo=function(page,el){
+  _origGoTo(page,el);
+  if(page==='visits') setTimeout(buildDentalChart,50);
+};
+
+// Also build chart on initial visits page render
+document.addEventListener('DOMContentLoaded',()=>{
+  // Build chart if visits page is active on load
+  if(document.getElementById('page-visits').classList.contains('active')){
+    buildDentalChart();
+  }
+});
+
+// ── PATIENTS TABLE ──
+function renderPatients(){
+  const q=(document.getElementById('pt-search').value||'').toLowerCase();
+  const sf=document.getElementById('pt-filter').value;
+  const list=patients.filter(p=>(p.fname+' '+p.lname+(p.phone||'')+(p.id||'')).toLowerCase().includes(q)&&(!sf||p.status===sf));
+  document.getElementById('pt-count-sub').textContent=patients.length+' '+(lang==='ar'?'مريض مسجّل':'patient'+(patients.length!==1?'s':'')+' registered');
+  const tbody=document.getElementById('pt-tbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><strong>${t('no-results')}</strong><p></p></div></td></tr>`;return;}
+  tbody.innerHTML=list.map(p=>{
+    const pv=visits.filter(v=>v.pid===p._id);
+    const last=pv.length?pv.reduce((a,b)=>a.date>b.date?a:b).date:null;
+    return`<tr>
+      <td><div class="pt-cell"><div class="avatar">${initials(p)}</div><div><div class="pt-main">${p.fname} ${p.lname}</div><div class="pt-sub">${p.gender||''} ${p.dob?'· '+calcAge(p.dob):''}</div></div></div></td>
+      <td class="hide-mobile" style="font-size:11px;color:var(--gray-400);">${p.id||'—'}</td>
+      <td class="hide-mobile" style="font-size:13px;">${calcAge(p.dob)}</td>
+      <td style="font-size:12px;">${p.phone||'—'}</td>
+      <td class="hide-mobile" style="font-size:12px;font-weight:600;color:var(--danger);">${p.blood||'—'}</td>
+      <td class="hide-mobile" style="font-size:12px;color:var(--gray-400);">${last?fmtDate(last):(lang==='ar'?'لم يزر بعد':'Never')}</td>
+      <td>${badgeHtml(p.status)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="viewPatient('${p._id}')">${lang==='ar'?'عرض':'View'}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── VIEW PATIENT ──
+window.viewPatient=function(docId){
+  _printPatientId=docId;
+  const p=patients.find(x=>x._id===docId);if(!p)return;
+  const pv=visits.filter(v=>v.pid===docId);
+  const gLabel=p.gender?(p.gender==='Male'?t('opt-male'):t('opt-female')):'—';
+  document.getElementById('modal-title').textContent=p.fname+' '+p.lname;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--gray-100);">
+      <div class="avatar" style="width:50px;height:50px;font-size:15px;">${initials(p)}</div>
+      <div><div style="font-size:17px;font-weight:600;color:var(--navy);">${p.fname} ${p.lname}</div>
+      <div style="font-size:12px;color:var(--gray-400);margin-top:3px;">${p.id||''} · ${badgeHtml(p.status)}</div></div>
+    </div>
+    <div class="det-grid">
+      <div class="det-row"><div class="det-label">${t('lbl-dob')}</div><div class="det-val">${fmtDate(p.dob)}</div></div>
+      <div class="det-row"><div class="det-label">${t('lbl-gender')} / ${t('th-age')}</div><div class="det-val">${gLabel}${p.dob?' / '+calcAge(p.dob):''}</div></div>
+      <div class="det-row"><div class="det-label">${t('lbl-phone')}</div><div class="det-val">${p.phone||'—'}</div></div>
+      <div class="det-row"><div class="det-label">${t('lbl-nid')}</div><div class="det-val">${p.nid||'—'}</div></div>
+      <div class="det-row"><div class="det-label">${t('lbl-blood')}</div><div class="det-val" style="font-weight:600;color:var(--danger);">${p.blood||'—'}</div></div>
+      <div class="det-row"><div class="det-label">${t('lbl-allergy')}</div><div class="det-val">${p.allergy||'—'}</div></div>
+    </div>
+    ${p.conditions?`<div style="margin:12px 0;background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 14px;"><div class="det-label">${t('lbl-conditions')}</div><div class="det-val" style="margin-top:3px;">${p.conditions}</div></div>`:''}
+    ${p.complaint?`<div style="margin:12px 0 20px;background:var(--light-blue);border-radius:var(--radius-sm);padding:10px 14px;"><div class="det-label" style="color:var(--blue);">${t('lbl-complaint')}</div><div class="det-val" style="margin-top:3px;">${p.complaint}</div></div>`:''}
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">${t('card-visit-history')} (${pv.length})</div>
+    ${pv.length?[...pv].sort((a,b)=>b.date.localeCompare(a.date)).map(v=>`<div class="visit-item"><div class="vdate"><div class="vdate-main">${fmtDate(v.date).split(' ').slice(0,2).join(' ')}</div><div class="vdate-yr">${fmtDate(v.date).split(' ')[2]||''}</div></div><div class="vdot"></div><div class="vdet"><strong>${v.proc||''}</strong><span>${v.tooth?t('lbl-v-tooth')+': '+v.tooth+' · ':''} ${v.notes||''}</span></div>${v.cost?`<div class="vcost">EGP ${Number(v.cost).toLocaleString()}</div>`:''}</div>`).join(''):`<div style="font-size:13px;color:var(--gray-400);padding:12px 0;">${t('no-visits-yet')}</div>`}
+  `;
+  document.getElementById('modal-del-btn').textContent=lang==='ar'?'حذف':'Delete';
+  document.getElementById('modal-del-btn').onclick=async()=>{
+    if(!confirm(t('confirm-del-patient')))return;
+    setSyncState('syncing');
+    try{
+      const uid=currentUser.uid;
+      await deleteDoc(doc(_fbDb,`users/${uid}/patients`,docId));
+      const batch=writeBatch(_fbDb);
+      visits.filter(v=>v.pid===docId).forEach(v=>batch.delete(doc(_fbDb,`users/${uid}/visits`,v._id)));
+      await batch.commit();
+      closeModal('pt-modal');
+      showToast(t('ok-del-patient'),'err');
+    }catch(e){showToast('Error: '+e.message,'err');}
+  };
+  document.getElementById('pt-modal').classList.add('open');
+};
+document.getElementById('pt-modal').addEventListener('click',e=>{if(e.target.id==='pt-modal')closeModal('pt-modal');});
+
+// ── SAVE PATIENT ──
+window.savePatient=async function(){
+  const fname=document.getElementById('a-fname').value.trim();
+  const lname=document.getElementById('a-lname').value.trim();
+  if(!fname||!lname){showMsg('add-msg',t('err-fill-name'),false);return;}
+  const dob=document.getElementById('a-dob').value;
+  if(dob && dob > today()){
+    showMsg('add-msg', lang==='ar' ? 'تاريخ الميلاد يجب أن يكون في الماضي' : 'Date of birth must be in the past.', false);
+    return;
+  }
+  const btn=document.getElementById('btn-save-patient-btn');
+  btn.disabled=true;setSyncState('syncing');
+  const uid=currentUser.uid;
+  const countSnap=await getDocs(collection(_fbDb,`users/${uid}/patients`));
+  const id='PT-'+String(countSnap.size+1).padStart(4,'0');
+  const data={id,fname,lname,
+    dob:document.getElementById('a-dob').value,
+    gender:document.getElementById('a-gender').value,
+    phone:document.getElementById('a-phone').value.trim(),
+    nid:document.getElementById('a-nid').value.trim(),
+    address:document.getElementById('a-address').value.trim(),
+    blood:document.getElementById('a-blood').value,
+    allergy:document.getElementById('a-allergy').value.trim(),
+    conditions:document.getElementById('a-conditions').value.trim(),
+    complaint:document.getElementById('a-complaint').value.trim(),
+    status:document.getElementById('a-status').value,
+    regdate:document.getElementById('a-regdate').value||today()
+  };
+  try{
+    const docRef=await addDoc(collection(_fbDb,`users/${uid}/patients`),data);
+    showToast(t('ok-patient-saved'),'ok');
+    clearAddForm();
+    // Navigate to patients page and open the new patient's record
+    goTo('patients', document.getElementById('ni-patients'));
+    setMobActive('patients');
+    // Wait briefly for the realtime listener to update patients array, then open modal
+    setTimeout(()=>{
+      const newPat=patients.find(p=>p._id===docRef.id)||patients.find(p=>p.id===id);
+      if(newPat) viewPatient(newPat._id);
+    }, 800);
+  }catch(e){showMsg('add-msg','Error: '+e.message,false);}
+  btn.disabled=false;
+};
+window.clearAddForm=function(){
+  ['a-fname','a-lname','a-dob','a-phone','a-nid','a-address','a-allergy','a-conditions','a-complaint'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('a-gender').value='';
+  document.getElementById('a-blood').value='';
+  document.getElementById('a-status').value='Active';
+  document.getElementById('a-regdate').value=today();
+};
+
+// ── VISITS ──
+function updateVPatient(){
+  const sel=document.getElementById('v-patient');
+  const flt=document.getElementById('v-filter-patient');
+  const curSel=sel.value;
+  const curFlt=flt.value;
+  const sorted=[...patients].sort((a,b)=>(a.fname+a.lname).localeCompare(b.fname+b.lname));
+  const opts=sorted.map(p=>`<option value="${p._id}">${p.fname} ${p.lname} (${p.id||p._id.slice(0,6)})</option>`).join('');
+  sel.innerHTML='<option value=""></option>'+opts;
+  if(curSel)sel.value=curSel;
+  // Populate filter dropdown
+  const fltLabel=lang==='ar'?'جميع المرضى':'All patients';
+  flt.innerHTML=`<option value="">${fltLabel}</option>`+sorted.map(p=>`<option value="${p._id}">${p.fname} ${p.lname}</option>`).join('');
+  if(curFlt)flt.value=curFlt;
+}
+window.saveVisit=async function(){
+  const pid=document.getElementById('v-patient').value;
+  const date=document.getElementById('v-date').value;
+  if(!pid){showMsg('v-msg',t('err-sel-patient'),false);return;}
+  if(!date){showMsg('v-msg',t('err-sel-date'),false);return;}
+  // Visit date must be today or in the future
+  if(date < today()){
+    showMsg('v-msg', lang==='ar' ? 'تاريخ الزيارة يجب أن يكون اليوم أو في المستقبل' : 'Visit date must be today or in the future.', false);
+    return;
+  }
+  const nextAppt=document.getElementById('v-next').value;
+  // Next appointment must also be today or future
+  if(nextAppt && nextAppt < today()){
+    showMsg('v-msg', lang==='ar' ? 'الموعد القادم يجب أن يكون اليوم أو في المستقبل' : 'Next appointment must be today or in the future.', false);
+    return;
+  }
+  const proc=document.getElementById('v-proc').value;
+  const btn=document.getElementById('btn-save-visit');
+  btn.disabled=true;setSyncState('syncing');
+  // Capture chart data BEFORE clearing
+  const pid2=pid; // same as pid
+  const chartSnapshot=pid && toothDiagnoses[pid] ? JSON.parse(JSON.stringify(toothDiagnoses[pid])) : {};
+  try{
+    const uid=currentUser.uid;
+    await addDoc(collection(_fbDb,`users/${uid}/visits`),{
+      pid,date,proc,
+      tooth:document.getElementById('v-tooth').value.trim(),
+      cost:document.getElementById('v-cost').value||'0',
+      paid:document.getElementById('v-paid').value||'0',
+      notes:document.getElementById('v-notes').value.trim(),
+      next:nextAppt,
+      toothDiag: Object.keys(chartSnapshot).length>0 ? JSON.stringify(chartSnapshot) : ''
+    });
+    ['v-tooth','v-cost','v-paid','v-notes','v-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('v-date').value=today();
+    document.getElementById('v-patient').value='';
+    document.getElementById('v-proc').selectedIndex=0;
+    // Clear dental chart for this patient
+    if(pid && toothDiagnoses[pid]) toothDiagnoses[pid]={};
+    buildDentalChart();
+    showMsg('v-msg',t('ok-visit-saved'),true);
+    showToast(t('ok-visit-saved'),'ok');
+    if(nextAppt){
+      const p=patients.find(x=>x._id===pid);
+      if(p)openNotifyModal(p,nextAppt,proc);
+    }
+  }catch(e){showMsg('v-msg','Error: '+e.message,false);}
+  btn.disabled=false;
+};
+function renderVisits(){
+  const filterPid=document.getElementById('v-filter-patient').value;
+  const filtered=filterPid?visits.filter(v=>v.pid===filterPid):visits;
+  document.getElementById('v-count-badge').textContent=filtered.length;
+  // Update print button label to reflect filter
+  const printBtn=document.getElementById('btn-print-visits-label');
+  if(printBtn){
+    const fp=filterPid?patients.find(x=>x._id===filterPid):null;
+    printBtn.textContent=fp?(lang==='ar'?'طباعة زيارات '+fp.fname:'Print '+fp.fname+"'s visits"):(lang==='ar'?'طباعة الكل':'Print all');
+  }
+  const el=document.getElementById('v-list');
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>${t('no-visits-yet')}</strong><p></p></div>`;
+    return;
+  }
+  el.innerHTML=[...filtered].sort((a,b)=>b.date.localeCompare(a.date)).map(v=>{
+    const p=patients.find(x=>x._id===v.pid);
+    const bal=(+v.cost||0)-(+v.paid||0);
+    return`<div class="visit-item">
+      <div class="vdate"><div class="vdate-main">${fmtDate(v.date).split(' ').slice(0,2).join(' ')}</div><div class="vdate-yr">${fmtDate(v.date).split(' ')[2]||''}</div></div>
+      <div class="vdot"></div>
+      <div class="vdet"><strong>${p?p.fname+' '+p.lname:'—'}</strong><span>${v.proc||''}${v.tooth?' · '+v.tooth:''}${v.notes?' · '+v.notes:''}</span>
+      ${v.next?`<span style="color:var(--accent);font-size:11px;display:block;margin-top:2px;">${lang==='ar'?'الموعد القادم:':'Next:'} ${fmtDate(v.next)}</span>`:''}</div>
+      <div style="text-align:${lang==='ar'?'left':'right'};flex-shrink:0;">
+        ${v.cost&&+v.cost?`<div class="vcost">EGP ${Number(v.cost).toLocaleString()}</div>`:''}
+        ${bal>0?`<div class="vbal">Due: EGP ${bal.toLocaleString()}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NOTIFY ──
+function openNotifyModal(p,nextAppt,proc){
+  const dateStr=fmtDate(nextAppt);
+  const msg=lang==='ar'
+    ?`السيد/ة ${p.fname} ${p.lname}،\nنود تذكيركم بموعدكم في عيادة د. أيمن مصطفى العوضي للأسنان:\n📅 التاريخ: ${dateStr}\n🦷 الإجراء: ${proc}\n\nنرجو الحضور في الوقت المحدد.\nشكراً لثقتكم 🙏`
+    :`Dear ${p.fname} ${p.lname},\nThis is a reminder of your upcoming appointment at Dr. Ayman Mostafa Alawady Dental Clinic:\n📅 Date: ${dateStr}\n🦷 Procedure: ${proc}\n\nPlease arrive on time. Contact us to reschedule if needed.\nThank you 🙏`;
+  _notifyPhone=p.phone||'';
+  document.getElementById('nm-date').textContent=dateStr;
+  document.getElementById('nm-patient-name').textContent=p.fname+' '+p.lname+(p.phone?' · '+p.phone:'');
+  document.getElementById('nm-message').value=msg;
+  ['nm-title','nm-sub','nm-msg-label','nm-wa-label','nm-wa-sub','nm-sms-label','nm-sms-sub'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=t(id);
+  });
+  document.getElementById('btn-nm-skip').textContent=t('nm-skip');
+  document.getElementById('notify-modal').classList.add('open');
+}
+
+// ── PRINT ALL VISITS (or filtered patient) ──
+function printAllVisits(){
+  const filterPid=document.getElementById('v-filter-patient').value;
+  const filteredVisits=filterPid?visits.filter(v=>v.pid===filterPid):visits;
+  const filterPatient=filterPid?patients.find(x=>x._id===filterPid):null;
+  if(!filteredVisits.length){showToast(lang==='ar'?'لا توجد زيارات للطباعة':'No visits to print.');return;}
+
+  const dir=lang==='ar'?'rtl':'ltr';
+  const isAr=lang==='ar';
+  const ff=isAr?'Noto Kufi Arabic, Tahoma, Arial, sans-serif':'Arial, sans-serif';
+  const totalRev=filteredVisits.reduce((a,v)=>a+(+v.cost||0),0);
+  const totalPaid=filteredVisits.reduce((a,v)=>a+(+v.paid||0),0);
+  const totalBal=totalRev-totalPaid;
+  const sortedVisits=[...filteredVisits].sort((a,b)=>b.date.localeCompare(a.date));
+  const reportTitle=filterPatient
+    ?(isAr?`زيارات ${filterPatient.fname} ${filterPatient.lname}`:`Visits — ${filterPatient.fname} ${filterPatient.lname}`)
+    :(isAr?'سجل جميع الزيارات':'Full Visit Log');
+
+  // Patient info block
+  const patientBlock=filterPatient?`
+    <div style="background:#E8F3FB;border-radius:8px;padding:12px 18px;margin-bottom:18px;display:flex;gap:28px;flex-wrap:wrap;">
+      <div><div style="font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;">${isAr?'المريض':'Patient'}</div><div style="font-size:15px;font-weight:600;color:#0F3460;margin-top:2px;">${filterPatient.fname} ${filterPatient.lname}</div></div>
+      ${filterPatient.id?`<div><div style="font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;">ID</div><div style="font-size:13px;margin-top:2px;">${filterPatient.id}</div></div>`:''}
+      ${filterPatient.phone?`<div><div style="font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;">${isAr?'الهاتف':'Phone'}</div><div style="font-size:13px;margin-top:2px;">${filterPatient.phone}</div></div>`:''}
+      ${filterPatient.blood?`<div><div style="font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;">${isAr?'فصيلة الدم':'Blood'}</div><div style="font-size:13px;margin-top:2px;font-weight:600;color:#D94040;">${filterPatient.blood}</div></div>`:''}
+      ${filterPatient.allergy?`<div><div style="font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;">${isAr?'الحساسية':'Allergies'}</div><div style="font-size:13px;margin-top:2px;">${filterPatient.allergy}</div></div>`:''}
+    </div>`:'';
+
+  // Build chart section
+  const chartBlock=filterPatient
+    ? buildChartDiagTable(filterPatient._id, dir)
+    : (()=>{
+        const seenPids=new Set();
+        const patientsWithVisits=[];
+        sortedVisits.forEach(v=>{
+          if(!seenPids.has(v.pid)){seenPids.add(v.pid);const p2=patients.find(x=>x._id===v.pid);if(p2)patientsWithVisits.push(p2);}
+        });
+        if(!patientsWithVisits.length)return '';
+        return `<div style="margin-top:28px;border-top:2px solid #E8F3FB;padding-top:20px;">
+          <div style="font-size:14px;font-weight:600;color:#0F3460;margin-bottom:20px;">${isAr?'خرائط الأسنان — جميع المرضى':'Dental Charts — All Patients'}</div>
+          ${patientsWithVisits.map(p2=>`
+            <div style="page-break-inside:avoid;margin-bottom:28px;border:1px solid #E8F3FB;border-radius:8px;padding:16px;">
+              <div style="font-size:13px;font-weight:600;color:#0F3460;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #EEF2F7;">${p2.fname} ${p2.lname}${p2.id?' ('+p2.id+')':''}</div>
+              ${buildChartDiagTable(p2._id, dir)}
+            </div>`).join('')}
+        </div>`;
+      })();
+
+  // Build complete HTML
+  const html=`<!DOCTYPE html>
+<html lang="${isAr?'ar':'en'}" dir="${dir}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${reportTitle}</title>
+${isAr?'<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">':''}
+<style>
+*{box-sizing:border-box;}
+body{font-family:${ff};direction:${dir};padding:28px 36px;color:#1E3248;max-width:900px;margin:0 auto;font-size:13px;line-height:1.5;}
+h1{font-size:20px;color:#0F3460;margin:0 0 4px 0;font-weight:700;}
+.sub{font-size:12px;color:#8FA5BE;margin-bottom:18px;}
+.summary{display:flex;gap:20px;background:#F7F9FC;border-radius:8px;padding:14px 18px;margin-bottom:22px;flex-wrap:wrap;}
+.sum-item{display:flex;flex-direction:column;gap:3px;}
+.sum-label{font-size:10px;color:#8FA5BE;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.sum-val{font-size:18px;font-weight:700;color:#0F3460;}
+table{width:100%;border-collapse:collapse;margin-bottom:8px;}
+thead th{padding:9px 12px;text-align:${dir==='rtl'?'right':'left'};font-size:10px;font-weight:700;color:#8FA5BE;text-transform:uppercase;letter-spacing:.05em;background:#F7F9FC;border-bottom:1.5px solid #D9E3EE;}
+tbody td{padding:10px 12px;border-bottom:1px solid #EEF2F7;vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+.cost-cell{font-weight:700;color:#2BBFA4;}
+.bal-cell{color:#D94040;font-weight:700;}
+.next-appt{color:#1A5F9E;font-size:11px;margin-top:3px;}
+.chart-title{font-size:11px;font-weight:700;color:#1A5F9E;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid #E8F3FB;padding-bottom:7px;margin-bottom:16px;margin-top:20px;}
+svg{display:block;max-width:100%;height:auto;}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+  @page{margin:15mm;size:A4;}
+  .no-break{page-break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<h1>Dr. Ayman Mostafa Alawady — ${isAr?'عيادة الأسنان':'Dental Clinic'}</h1>
+<div class="sub">${reportTitle} — ${isAr?'تاريخ الطباعة:':'Printed:'} ${new Date().toLocaleDateString(isAr?'ar-EG':'en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+${patientBlock}
+<div class="summary">
+  <div class="sum-item"><div class="sum-label">${isAr?'عدد الزيارات':'Visits'}</div><div class="sum-val">${filteredVisits.length}</div></div>
+  <div class="sum-item"><div class="sum-label">${isAr?'إجمالي التكلفة':'Total Cost'}</div><div class="sum-val">EGP ${totalRev.toLocaleString()}</div></div>
+  <div class="sum-item"><div class="sum-label">${isAr?'إجمالي المدفوع':'Total Paid'}</div><div class="sum-val">EGP ${totalPaid.toLocaleString()}</div></div>
+  <div class="sum-item"><div class="sum-label">${isAr?'المتبقي':'Balance Due'}</div><div class="sum-val" style="color:${totalBal>0?'#D94040':'#2BBFA4'}">EGP ${totalBal.toLocaleString()}</div></div>
+</div>
+<table>
+  <thead><tr>
+    <th>${isAr?'التاريخ':'Date'}</th>
+    ${!filterPatient?`<th>${isAr?'المريض':'Patient'}</th>`:''}
+    <th>${isAr?'الإجراء':'Procedure'}</th>
+    <th>${isAr?'السن':'Tooth'}</th>
+    <th>${isAr?'التكلفة':'Cost (EGP)'}</th>
+    <th>${isAr?'المدفوع':'Paid (EGP)'}</th>
+    <th>${isAr?'المتبقي':'Balance'}</th>
+    <th>${isAr?'ملاحظات / الموعد القادم':'Notes / Next Appt'}</th>
+  </tr></thead>
+  <tbody>
+    ${sortedVisits.map(v=>{
+      const p=patients.find(x=>x._id===v.pid);
+      const cost=+v.cost||0;const paid=+v.paid||0;const bal=cost-paid;
+      return`<tr>
+        <td style="white-space:nowrap;font-weight:700;color:#0F3460;">${fmtDate(v.date)}</td>
+        ${!filterPatient?`<td>${p?p.fname+' '+p.lname:'—'}</td>`:''}
+        <td>${v.proc||'—'}</td>
+        <td>${v.tooth||'—'}</td>
+        <td class="cost-cell">${cost?'EGP '+cost.toLocaleString():'—'}</td>
+        <td>${paid?'EGP '+paid.toLocaleString():'—'}</td>
+        <td class="${bal>0?'bal-cell':''}">${bal>0?'EGP '+bal.toLocaleString():'✓'}</td>
+        <td style="font-size:12px;color:#4A6580;">${v.notes||'—'}${v.next?`<div class="next-appt">${isAr?'الموعد القادم:':'Next:'} ${fmtDate(v.next)}</div>`:''}</td>
+      </tr>`;
+    }).join('')}
+  </tbody>
+</table>
+${chartBlock}
+<script>
+// Wait for fonts and SVG to render before printing
+function doPrint(){
+  if(document.fonts&&document.fonts.ready){
+    document.fonts.ready.then(function(){setTimeout(function(){window.print();},400);});
+  } else {
+    setTimeout(function(){window.print();},1200);
+  }
+}
+window.onload=doPrint;
+<\/script>
+</body></html>`;
+
+  // Use Blob URL so the new window has proper origin and font loading
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  // Revoke blob URL after window loads
+  if(win){setTimeout(()=>URL.revokeObjectURL(url),30000);}
+  else{
+    // Fallback if popup blocked
+    const a=document.createElement('a');
+    a.href=url;a.target='_blank';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
+  }
+}
+
+// ── EXCEL EXPORT ──
+window.exportExcel=function(label){
+  if(!patients.length&&!visits.length){showToast(t('err-no-data'));return;}
+  const wb=XLSX.utils.book_new();
+  const ptH=['Patient ID','First Name','Last Name','Date of Birth','Age','Gender','Phone','National ID','Address','Blood Type','Allergies','Chronic Conditions','Chief Complaint','Status','Registration Date'];
+  const ptD=[ptH];
+  patients.forEach(p=>{
+    let age='';
+    if(p.dob){const b=new Date(p.dob),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;age=a;}
+    ptD.push([p.id||'',p.fname,p.lname,p.dob,age,p.gender,p.phone,p.nid,p.address,p.blood,p.allergy,p.conditions,p.complaint,p.status,p.regdate]);
+  });
+  const wsP=XLSX.utils.aoa_to_sheet(ptD);
+  wsP['!cols']=[10,14,14,14,6,9,15,17,24,9,20,24,30,10,16].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,wsP,'Patients');
+  const vtH=['Patient Name','Visit Date','Procedure','Tooth No.','Cost (EGP)','Paid (EGP)','Balance (EGP)','Notes','Next Appointment'];
+  const vtD=[vtH];
+  visits.forEach(v=>{
+    const p=patients.find(x=>x._id===v.pid);
+    vtD.push([p?p.fname+' '+p.lname:'',v.date,v.proc,v.tooth,+v.cost||0,+v.paid||0,(+v.cost||0)-(+v.paid||0),v.notes,v.next]);
+  });
+  const wsV=XLSX.utils.aoa_to_sheet(vtD);
+  wsV['!cols']=[20,12,22,12,11,10,12,34,16].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,wsV,'Visits');
+  const totR=visits.reduce((a,v)=>a+(+v.cost||0),0);
+  const totP=visits.reduce((a,v)=>a+(+v.paid||0),0);
+  const wsS=XLSX.utils.aoa_to_sheet([['Dr. Ayman Mostafa Alawady — Dental Clinic',''],['Export: '+new Date().toLocaleDateString('en-GB'),''],['',''],['Metric','Value'],['Total patients',patients.length],['Active',patients.filter(p=>normalizeStatus(p.status)==='Active').length],['Pending',patients.filter(p=>normalizeStatus(p.status)==='Pending').length],['Total visits',visits.length],['Revenue (EGP)',totR],['Paid (EGP)',totP],['Balance due (EGP)',totR-totP]]);
+  wsS['!cols']=[{wch:28},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,wsS,'Summary');
+  XLSX.writeFile(wb,(label||'AlAwady_Dental')+'-'+today()+'.xlsx');
+  showToast(t('ok-excel-dl'),'ok');
+};
+
+// ── EXCEL IMPORT ──
+window.importExcel=function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const wsP=wb.Sheets['Patients'];
+      let imp=0;
+      const uid=currentUser.uid;
+      if(wsP){
+        const rows=XLSX.utils.sheet_to_json(wsP,{header:1}).slice(1);
+        for(const r of rows){
+          if(!r[1])continue;
+          const exists=patients.find(p=>p.id===r[0]||( p.fname===r[1]&&p.lname===r[2]&&p.dob===r[3]));
+          if(!exists){
+            await addDoc(collection(_fbDb,`users/${uid}/patients`),{id:r[0]||'',fname:r[1]||'',lname:r[2]||'',dob:r[3]||'',gender:r[5]||'',phone:String(r[6]||''),nid:String(r[7]||''),address:r[8]||'',blood:r[9]||'',allergy:r[10]||'',conditions:r[11]||'',complaint:r[12]||'',status:r[13]||'Active',regdate:r[14]||today()});
+            imp++;
+          }
+        }
+      }
+      showMsg('import-msg',imp+' '+t('ok-imported'),true);
+      showToast(imp+' '+t('ok-imported'),'ok');
+    }catch(err){showMsg('import-msg','Import failed: '+err.message,false);}
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value='';
+};
+
+// ── MONTHLY RESET ──
+window.monthlyReset=async function(){
+  if(!confirm(t('confirm-reset')))return;
+  exportExcel('Backup');
+  setSyncState('syncing');
+  const uid=currentUser.uid;
+  const batch=writeBatch(_fbDb);
+  patients.forEach(p=>batch.delete(doc(_fbDb,`users/${uid}/patients`,p._id)));
+  visits.forEach(v=>batch.delete(doc(_fbDb,`users/${uid}/visits`,v._id)));
+  await batch.commit();
+  showToast(t('ok-reset'),'ok');
+};
+
+// ── DELETE ALL DATA ──
+window.deleteAllData=async function(){
+  if(!confirm(t('confirm-del-all')))return;
+  setSyncState('syncing');
+  const uid=currentUser.uid;
+  const batch=writeBatch(_fbDb);
+  patients.forEach(p=>batch.delete(doc(_fbDb,`users/${uid}/patients`,p._id)));
+  visits.forEach(v=>batch.delete(doc(_fbDb,`users/${uid}/visits`,v._id)));
+  await batch.commit();
+  showToast(t('ok-del-all'),'err');
+};
+
+// ── INIT ──
+applyLang();
+
+// ── EXPOSE FUNCTIONS TO window (for onclick attributes) ──
+_toggleAuthMode = toggleAuthMode;
+_authAction = authAction;
+_goTo = goTo;
+_setMobActive = setMobActive;
+_viewPatient = viewPatient;
+_savePatient = savePatient;
+_clearAddForm = clearAddForm;
+_saveVisit = saveVisit;
+_exportExcel = exportExcel;
+_importExcel = importExcel;
+_monthlyReset = monthlyReset;
+_deleteAllData = deleteAllData;
+_renderPatients = renderPatients;
+_buildDentalChart = buildDentalChart;
+_updateToothColorPreview = updateToothColorPreview;
+_sendWhatsApp = sendWhatsApp;
+_sendSMS = sendSMS;
+_printAllVisits = printAllVisits;
+
+// Override toggleLang to also call applyLang from this scope
+window.toggleLang = function(){
+  lang = lang==='en' ? 'ar' : 'en';
+  localStorage.setItem('dc_lang', lang);
+  applyLang();
+};
+
+// Clear timeout — Firebase loaded successfully
+clearTimeout(_loadTimeout);
+
+</script>
+</body>
+</html>
